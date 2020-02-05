@@ -12,6 +12,8 @@ add_library(
 add_executable(
     gtests
     main.cpp
+    utkernel/util/system_call_logger.c
+    utkernel/util/system_call_logger_test.cpp
     )
 
 add_dependencies(gtests googletest)
