@@ -1,0 +1,29 @@
+﻿
+@startuml state machine diagram
+skinparam {
+    defaultFontName Ricty Diminished
+    monochrome true
+}
+hide empty description
+
+state Task {
+    state Ready
+    state Running
+    state Blocked
+    state Suspended
+
+    [*] -> Ready
+    Suspended --> Ready : Resume()\n called
+    Ready -> Suspended : Suspend()\n called
+    Blocked -up-> Ready : Event
+    Blocked -up-> Suspended : Suspend()\n called
+    Ready --> Running : Dispatched
+    Running -> Ready : Preempted
+    Running -> Blocked : Blocking API called
+    Running -> Suspended : Suspend()\n called
+}
+
+[*] --> Task : New
+Task --> [*] : Delete
+
+@enduml
