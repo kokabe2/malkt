@@ -6,12 +6,16 @@ include_directories(
 
 add_library(
     malkt
+    utkernel/task/task.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
     )
 
 add_executable(
     gtests
     main.cpp
+    utkernel/task/function_entry_spy.c
+    utkernel/task/utkernel_task_spy.c
+    utkernel/task/task_test.cpp
     utkernel/util/system_call_logger.c
     utkernel/util/system_call_logger_test.cpp
     )
