@@ -14,7 +14,7 @@ add_executable(
     gtests
     main.cpp
     utkernel/task/function_entry_spy.c
-    utkernel/task/utkernel_task_spy.c
+    utkernel/task/utkernel_tsk_spy.c
     utkernel/task/task_test.cpp
     utkernel/util/system_call_logger.c
     utkernel/util/system_call_logger_test.cpp

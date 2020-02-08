@@ -1,6 +1,6 @@
 // Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
-#include "utkernel_task_spy.h"
+#include "utkernel_tsk_spy.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -40,7 +40,7 @@ static RELTIM DelayTime(void) { return its_delay_time; }
 static void SetReturnCode(int number, INT code) {
   return_codes[number_of_executions + number] = code;
 }
-static const UtkernelTaskSpyMethodStruct kTheMethod = {
+static const UtkernelTskSpyMethodStruct kTheMethod = {
     .Reset = Reset,
     .Attribute = Attribute,
     .Priority = Priority,
@@ -49,7 +49,7 @@ static const UtkernelTaskSpyMethodStruct kTheMethod = {
     .DelayTime = DelayTime,
     .SetReturnCode = SetReturnCode,
 };
-const UtkernelTaskSpyMethod utkernelTaskSpy = &kTheMethod;
+const UtkernelTskSpyMethod utkernelTskSpy = &kTheMethod;
 
 inline static void Enter(const char *system_call_name, INT id) {
   systemCallLogger->Enter(system_call_name, id);

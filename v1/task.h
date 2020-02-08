@@ -11,7 +11,6 @@ enum {
 
 typedef struct TaskStruct* Task;
 typedef void (*ActionDelegate)(void);
-
 typedef struct {
   Task (*New)(ActionDelegate action, int priority, int stack_size);
   void (*Delete)(Task* self);

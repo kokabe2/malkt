@@ -1,7 +1,7 @@
 // Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
-#ifndef SRC_UTKERNEL_TASK_UTKERNEL_TASK_SPY_H_
-#define SRC_UTKERNEL_TASK_UTKERNEL_TASK_SPY_H_
+#ifndef SRC_UTKERNEL_TASK_UTKERNEL_TSK_SPY_H_
+#define SRC_UTKERNEL_TASK_UTKERNEL_TSK_SPY_H_
 
 #include <stdbool.h>
 
@@ -17,9 +17,9 @@ typedef struct {
   TMO (*Timeout)(void);
   RELTIM (*DelayTime)(void);
   void (*SetReturnCode)(int number, INT code);
-} UtkernelTaskSpyMethodStruct;
-typedef const UtkernelTaskSpyMethodStruct* UtkernelTaskSpyMethod;
+} UtkernelTskSpyMethodStruct;
+typedef const UtkernelTskSpyMethodStruct* UtkernelTskSpyMethod;
 
-extern const UtkernelTaskSpyMethod utkernelTaskSpy;
+extern const UtkernelTskSpyMethod utkernelTskSpy;
 
-#endif  // SRC_UTKERNEL_TASK_UTKERNEL_TASK_SPY_H_
+#endif  // SRC_UTKERNEL_TASK_UTKERNEL_TSK_SPY_H_
