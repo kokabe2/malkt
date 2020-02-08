@@ -18,6 +18,8 @@ add_executable(
     utkernel/task/task_test.cpp
     utkernel/util/system_call_logger.c
     utkernel/util/system_call_logger_test.cpp
+    utkernel/util/system_call_template.c
+    utkernel/util/system_call_template_test.cpp
     )
 
 add_dependencies(gtests googletest)
