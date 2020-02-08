@@ -2,7 +2,6 @@
 // This software is released under the MIT License, see LICENSE.
 #include "utkernel_tsk_spy.h"
 
-#include <stdio.h>
 #include <string.h>
 
 #include "../util/system_call_logger.h"
