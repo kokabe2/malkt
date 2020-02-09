@@ -18,14 +18,16 @@ class MemoryPoolTest : public ::testing::Test {
   MemoryPool mp;
   virtual void SetUp() {
     utkernelMpfSpy->Reset();
-    systemCallLogger->Reset();
     mp = memoryPool->New(memory_area, sizeof(memory_area), 32);
+    systemCallLogger->Reset();
   }
   virtual void TearDown() { memoryPool->Delete(&mp); }
 };
 
-TEST_F(MemoryPoolTest, ConditionAfterNew) {
-  ASSERT_TRUE(mp != NULL);
+TEST_F(MemoryPoolTest, New) {
+  MemoryPool instance = memoryPool->New(memory_area, sizeof(memory_area), 32);
+
+  ASSERT_TRUE(instance != NULL);
   EXPECT_EQ((TA_TFIFO | TA_RNG0 | TA_USERBUF), utkernelMpfSpy->Attribute());
   EXPECT_EQ(16, utkernelMpfSpy->BlockCount());
   EXPECT_EQ(32, utkernelMpfSpy->BlockSize());
@@ -34,11 +36,12 @@ TEST_F(MemoryPoolTest, ConditionAfterNew) {
       "+ tk_cre_mpf\n"
       "- tk_cre_mpf (0)\n",
       systemCallLogger->Get());
+
+  memoryPool->Delete(&instance);
 }
 
 TEST_F(MemoryPoolTest, NewWhenMemoryPoolCreationFailed) {
   utkernelMpfSpy->SetReturnCode(0, -34);
-  systemCallLogger->Reset();
 
   EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), 32));
   EXPECT_STREQ(
@@ -48,8 +51,6 @@ TEST_F(MemoryPoolTest, NewWhenMemoryPoolCreationFailed) {
 }
 
 TEST_F(MemoryPoolTest, NewWithInvalidArgument) {
-  systemCallLogger->Reset();
-
   EXPECT_EQ(NULL, memoryPool->New(NULL, sizeof(memory_area), 32));
   EXPECT_EQ(NULL, memoryPool->New(memory_area, 0, 32));
   EXPECT_EQ(NULL, memoryPool->New(memory_area, -128, 32));
@@ -61,8 +62,6 @@ TEST_F(MemoryPoolTest, NewWithInvalidArgument) {
 }
 
 TEST_F(MemoryPoolTest, Delete) {
-  systemCallLogger->Reset();
-
   memoryPool->Delete(&mp);
 
   EXPECT_EQ(NULL, mp);
@@ -82,8 +81,6 @@ TEST_F(MemoryPoolTest, DeleteMultipleTimes) {
 }
 
 TEST_F(MemoryPoolTest, Get) {
-  systemCallLogger->Reset();
-
   EXPECT_TRUE(memoryPool->Get(mp) != NULL);
   EXPECT_EQ(TMO_POL, utkernelMpfSpy->Timout());
   EXPECT_STREQ(
@@ -94,7 +91,6 @@ TEST_F(MemoryPoolTest, Get) {
 
 TEST_F(MemoryPoolTest, GetWhenMemoryBlockAcquisitionFailed) {
   utkernelMpfSpy->SetReturnCode(0, -50);
-  systemCallLogger->Reset();
 
   EXPECT_EQ(NULL, memoryPool->Get(mp));
   EXPECT_STREQ(
@@ -116,8 +112,6 @@ TEST_F(MemoryPoolTest, Release) {
 }
 
 TEST_F(MemoryPoolTest, ReleaseWithInvalidArgument) {
-  systemCallLogger->Reset();
-
   memoryPool->Release(mp, NULL);
 
   EXPECT_STREQ("", systemCallLogger->Get());
@@ -125,10 +119,11 @@ TEST_F(MemoryPoolTest, ReleaseWithInvalidArgument) {
 
 TEST_F(MemoryPoolTest, CallMethodWithNullInstance) {
   void *block = memoryPool->Get(mp);
+  systemCallLogger->Reset();
 
   memoryPool->Delete(NULL);
   EXPECT_EQ(NULL, memoryPool->Get(NULL));
   memoryPool->Release(NULL, block);
 
-  SUCCEED();
+  EXPECT_STREQ("", systemCallLogger->Get());
 }
