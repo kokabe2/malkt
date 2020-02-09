@@ -34,13 +34,11 @@ inline static int Reverse(int priority) {
   return kHighestTaskPriority - priority + kPriorityOffset;
 }
 inline static bool CreateTask(Task self, int priority, int stack_size) {
-  T_CTSK packet = {
-      .exinf = (void*)self,
-      .tskatr = (TA_HLNG | TA_RNG0),
-      .task = (FP)TaskEntry,
-      .itskpri = (PRI)Reverse(priority),
-      .stksz = (SZ)stack_size,
-  };
+  T_CTSK packet = {.exinf = (void*)self,
+                   .tskatr = (TA_HLNG | TA_RNG0),
+                   .task = (FP)TaskEntry,
+                   .itskpri = (PRI)Reverse(priority),
+                   .stksz = (SZ)stack_size};
   return (self->id = tk_cre_tsk(&packet)) >= 0;
 }
 static Task New(ActionDelegate action, int priority, int stack_size) {
