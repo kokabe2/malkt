@@ -3,8 +3,6 @@
 #ifndef SRC_UTKERNEL_INBOX_UTKERNEL_MPL_SPY_H_
 #define SRC_UTKERNEL_INBOX_UTKERNEL_MPL_SPY_H_
 
-#include <stdbool.h>
-
 #include "utkernel/utkernel.h"
 
 typedef struct {

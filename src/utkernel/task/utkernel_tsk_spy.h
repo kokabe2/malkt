@@ -3,8 +3,6 @@
 #ifndef SRC_UTKERNEL_TASK_UTKERNEL_TSK_SPY_H_
 #define SRC_UTKERNEL_TASK_UTKERNEL_TSK_SPY_H_
 
-#include <stdbool.h>
-
 #include "utkernel/utkernel.h"
 
 #define TTS_NONE 0x00000000

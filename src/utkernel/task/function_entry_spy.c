@@ -2,8 +2,6 @@
 // This software is released under the MIT License, see LICENSE.
 #include "function_entry_spy.h"
 
-#include <stddef.h>
-
 static bool was_run;
 
 static void TaskFunction(void) { was_run = true; }
