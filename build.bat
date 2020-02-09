@@ -11,6 +11,7 @@ mkdir %OUTPUT_DIR% > NUL 2>&1
 %COMPILER% -output=obj=%OUTPUT_DIR%/%PROJECT_NAME%.obj -lang=c99 -nostuff -isa=rxv3 ^
            -include=v1/,external/ ^
            src/utkernel/inbox/inbox.c ^
+           src/utkernel/isr/isr.c ^
            src/utkernel/memory_pool/memory_pool.c ^
            src/utkernel/task/task.c
 if %errorlevel% neq 0 exit /b
