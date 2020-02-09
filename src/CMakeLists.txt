@@ -6,6 +6,7 @@ include_directories(
 
 add_library(
     malkt
+    utkernel/inbox/inbox.c
     utkernel/task/task.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
     )
@@ -13,6 +14,9 @@ add_library(
 add_executable(
     gtests
     main.cpp
+    utkernel/inbox/inbox_test.cpp
+    utkernel/inbox/utkernel_mbx_spy.c
+    utkernel/inbox/utkernel_mpl_spy.c
     utkernel/task/function_entry_spy.c
     utkernel/task/utkernel_tsk_spy.c
     utkernel/task/task_test.cpp
