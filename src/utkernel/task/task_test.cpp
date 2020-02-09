@@ -15,14 +15,16 @@ class TaskTest : public ::testing::Test {
   virtual void SetUp() {
     functionEntrySpy->Reset();
     utkernelTskSpy->Reset();
-    systemCallLogger->Reset();
     t = task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize);
+    systemCallLogger->Reset();
   }
   virtual void TearDown() { task->Delete(&t); }
 };
 
-TEST_F(TaskTest, ConditionAfterNew) {
-  ASSERT_TRUE(t != NULL);
+TEST_F(TaskTest, New) {
+  Task instance = task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize);
+
+  ASSERT_TRUE(instance != NULL);
   EXPECT_EQ(TA_HLNG | TA_RNG0, utkernelTskSpy->Attribute());
   EXPECT_EQ(9, utkernelTskSpy->Priority());
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
@@ -31,6 +33,8 @@ TEST_F(TaskTest, ConditionAfterNew) {
       "+ tk_cre_tsk\n"
       "- tk_cre_tsk (0)\n",
       systemCallLogger->Get());
+
+  task->Delete(&instance);
 }
 
 TEST_F(TaskTest, NewWithBoundaryPriority) {
@@ -47,7 +51,6 @@ TEST_F(TaskTest, NewWithBoundaryPriority) {
 
 TEST_F(TaskTest, NewWhenTaskCreationFailed) {
   utkernelTskSpy->SetReturnCode(0, -34);
-  systemCallLogger->Reset();
 
   EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize));
   EXPECT_STREQ(
@@ -64,11 +67,10 @@ TEST_F(TaskTest, NewWithInvalidArguments) {
                             kMaxTaskStackSize));
   EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, 0));
   EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize + 1));
+  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(TaskTest, DeleteSelfTask) {
-  systemCallLogger->Reset();
-
   task->Delete(&t);
 
   EXPECT_EQ(NULL, t);
@@ -82,7 +84,6 @@ TEST_F(TaskTest, DeleteSelfTask) {
 
 TEST_F(TaskTest, DeleteOtherTask) {
   utkernelTskSpy->SetReturnCode(0, 1);
-  systemCallLogger->Reset();
 
   task->Delete(&t);
 
@@ -107,8 +108,6 @@ TEST_F(TaskTest, DeleteMultipleTimes) {
 }
 
 TEST_F(TaskTest, Run) {
-  systemCallLogger->Reset();
-
   task->Run(t);
 
   EXPECT_TRUE(functionEntrySpy->WasRun());
@@ -121,8 +120,6 @@ TEST_F(TaskTest, Run) {
 }
 
 TEST_F(TaskTest, SuspendSelfTask) {
-  systemCallLogger->Reset();
-
   task->Suspend(t);
 
   EXPECT_EQ(TMO_FEVR, utkernelTskSpy->Timeout());
@@ -136,7 +133,6 @@ TEST_F(TaskTest, SuspendSelfTask) {
 
 TEST_F(TaskTest, SuspendOtherTask) {
   utkernelTskSpy->SetReturnCode(0, 1);
-  systemCallLogger->Reset();
 
   task->Suspend(t);
 
@@ -151,8 +147,6 @@ TEST_F(TaskTest, SuspendOtherTask) {
 }
 
 TEST_F(TaskTest, SuspendMultipleTimes) {
-  systemCallLogger->Reset();
-
   task->Suspend(t);
   task->Suspend(t);
   task->Suspend(t);
@@ -191,8 +185,6 @@ TEST_F(TaskTest, ResumeTaskSuspendedByOther) {
 }
 
 TEST_F(TaskTest, ResumeTaskNotSuspended) {
-  systemCallLogger->Reset();
-
   task->Resume(t);
 
   EXPECT_STREQ("", systemCallLogger->Get());
@@ -213,8 +205,6 @@ TEST_F(TaskTest, ResumeMultipleTimes) {
 }
 
 TEST_F(TaskTest, Delay) {
-  systemCallLogger->Reset();
-
   task->Delay(100);
 
   EXPECT_EQ(100, utkernelTskSpy->DelayTime());
@@ -225,8 +215,6 @@ TEST_F(TaskTest, Delay) {
 }
 
 TEST_F(TaskTest, DelayWithTimeZeroOrLess) {
-  systemCallLogger->Reset();
-
   task->Delay(0);
   task->Delay(-100);
 
@@ -239,5 +227,5 @@ TEST_F(TaskTest, CallMethodWithNullInstance) {
   task->Suspend(NULL);
   task->Resume(NULL);
 
-  SUCCEED();
+  EXPECT_STREQ("", systemCallLogger->Get());
 }
