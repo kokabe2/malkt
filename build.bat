@@ -13,7 +13,8 @@ mkdir %OUTPUT_DIR% > NUL 2>&1
            src/utkernel/inbox/inbox.c ^
            src/utkernel/isr/isr.c ^
            src/utkernel/memory_pool/memory_pool.c ^
-           src/utkernel/task/task.c
+           src/utkernel/task/task.c ^
+           src/utkernel/uptime/uptime.c
 if %errorlevel% neq 0 exit /b
 rlink -form=lib -output=%OUTPUT_DIR%/%PROJECT_NAME%.lib ^
       %OUTPUT_DIR%/%PROJECT_NAME%.obj
