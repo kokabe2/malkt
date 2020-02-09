@@ -99,9 +99,11 @@ TEST_F(TaskTest, DeleteOtherTask) {
 
 TEST_F(TaskTest, DeleteMultipleTimes) {
   task->Delete(&t);
+  systemCallLogger->Reset();
+
   task->Delete(&t);
 
-  EXPECT_EQ(NULL, t);
+  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(TaskTest, Run) {
