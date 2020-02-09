@@ -94,7 +94,7 @@ static bool GetNextMail(Inbox self) {
     self->last_mail = NULL;  // Just in case.
   return self->last_mail;
 }
-static void* GetTemplate(Inbox self, GetDelegate get) {
+inline static void* GetTemplate(Inbox self, GetDelegate get) {
   if (!self) return NULL;
   DeleteLastMailIfNeeded(self);
   return get(self) ? ExtractMessage(self->last_mail) : NULL;
