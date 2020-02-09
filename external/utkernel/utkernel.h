@@ -90,6 +90,13 @@ typedef struct {
   void *bufptr;
 } T_CMPL;
 typedef struct {
+  void *exinf;
+  ATR mpfatr;
+  SZ mpfcnt;
+  SZ blfsz;
+  void *bufptr;
+} T_CMPF;
+typedef struct {
   W hi;
   UW lo;
 } SYSTIM;
@@ -143,6 +150,10 @@ ER tk_del_mbx(ID mbxid);
 ER tk_snd_mbx(ID mbxid, T_MSG *pk_msg);
 ER tk_rcv_mbx(ID mbxid, T_MSG **ppk_msg, TMO tmout);
 
+ID tk_cre_mpf(CONST T_CMPF *pk_cmpf);
+ER tk_del_mpf(ID mpfid);
+ER tk_get_mpf(ID mpfid, void **p_blf, TMO tmout);
+ER tk_rel_mpf(ID mpfid, void *blf);
 ID tk_cre_mpl(CONST T_CMPL *pk_cmpl);
 ER tk_del_mpl(ID mplid);
 ER tk_get_mpl(ID mplid, SZ blksz, void **p_blk, TMO tmout);
