@@ -26,6 +26,7 @@ static void Reset(void) {
 static ATR Attribute(void) { return its_attribute; }
 static RELTIM CycleTime(void) { return its_cycle_time; }
 static RELTIM CyclePhase(void) { return its_cycle_phase; }
+static void RunTimer(void) { its_timer(its_exinf); }
 static void SetReturnCode(int number, INT code) {
   return_codes[number_of_executions + number] = code;
 }
@@ -34,6 +35,7 @@ static const UtkernelCycSpyMethodStruct kTheMethod = {
     .Attribute = Attribute,
     .CycleTime = CycleTime,
     .CyclePhase = CyclePhase,
+    .RunTimer = RunTimer,
     .SetReturnCode = SetReturnCode,
 };
 const UtkernelCycSpyMethod utkernelCycSpy = &kTheMethod;
@@ -45,19 +47,16 @@ static void _tk_cre_cyc(const void *info) {
   its_timer = pk_ccyc->cychdr;
   its_cycle_time = pk_ccyc->cyctim;
   its_cycle_phase = pk_ccyc->cycphs;
-  its_timer(its_exinf);
 }
 ID tk_cre_cyc(CONST T_CCYC *pk_ccyc) {
   systemCallTemplate->SetReturnCode(return_codes[number_of_executions++]);
   return systemCallTemplate->Execute(__func__, _tk_cre_cyc, pk_ccyc);
 }
-inline static INT Template(const char *system_call_name, ID cycid,
-                           ExecuteDelegate execute) {
+inline static INT Template(const char *system_call_name, ID cycid) {
   systemCallTemplate->SetId(cycid);
   systemCallTemplate->SetReturnCode(return_codes[number_of_executions++]);
-  return systemCallTemplate->Execute(system_call_name, execute, NULL);
+  return systemCallTemplate->Execute(system_call_name, NULL, NULL);
 }
-ER tk_del_cyc(ID cycid) { return Template(__func__, cycid, NULL); }
-static void _tk_sta_cyc(const void *unused) { its_timer(its_exinf); }
-ER tk_sta_cyc(ID cycid) { return Template(__func__, cycid, _tk_sta_cyc); }
-ER tk_stp_cyc(ID cycid) { return Template(__func__, cycid, NULL); }
+ER tk_del_cyc(ID cycid) { return Template(__func__, cycid); }
+ER tk_sta_cyc(ID cycid) { return Template(__func__, cycid); }
+ER tk_stp_cyc(ID cycid) { return Template(__func__, cycid); }

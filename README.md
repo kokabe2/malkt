@@ -16,6 +16,7 @@ Malkt is micro abstraction layered kernel task-based.
 - Task
 - Timer
   - Interval timer
+  - One-shot timer
 - Inbox
 - Memory pool
 - ISR

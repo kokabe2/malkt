@@ -6,6 +6,21 @@
 #include "timer_private.h"
 #include "utkernel/utkernel.h"
 
+static bool CreateTimer(Timer self, int delay_in_milliseconds,
+                        int period_in_milliseconds,
+                        void (*handler)(void* exinf)) {
+  T_CCYC packet = {.exinf = self,
+                   .cycatr = TA_HLNG | TA_STA | TA_PHS,
+                   .cychdr = (FP)handler,
+                   .cyctim = (RELTIM)period_in_milliseconds,
+                   .cycphs = (RELTIM)delay_in_milliseconds};
+  return (self->id = tk_cre_cyc(&packet)) >= 0;
+}
+static const TimerPrivateMethodStruct kPrivateMethod = {
+    .CreateTimer = CreateTimer,
+};
+const TimerPrivateMethod _timer = &kPrivateMethod;
+
 static void Delete(Timer* self) {
   if (!self || !*self) return;
   tk_del_cyc((*self)->id);
@@ -15,7 +30,7 @@ static void Pause(Timer self) {
   if (self) tk_stp_cyc(self->id);
 }
 static void Resume(Timer self) {
-  if (self) tk_sta_cyc(self->id);
+  if (self) self->impl->Resume(self);
 }
 static const TimerAbstractMethodStruct kTheMethod = {
     .Delete = Delete, .Pause = Pause, .Resume = Resume,

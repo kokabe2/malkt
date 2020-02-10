@@ -28,11 +28,14 @@ TEST_F(IntervalTimerTest, New) {
   EXPECT_EQ((TA_HLNG | TA_STA | TA_PHS), utkernelCycSpy->Attribute());
   EXPECT_EQ(10, utkernelCycSpy->CycleTime());
   EXPECT_EQ(10, utkernelCycSpy->CyclePhase());
-  EXPECT_TRUE(timerSpy->WasRun());
   EXPECT_STREQ(
       "+ tk_cre_cyc\n"
       "- tk_cre_cyc (0)\n",
       systemCallLogger->Get());
+
+  EXPECT_FALSE(timerSpy->WasRun());
+  utkernelCycSpy->RunTimer();
+  EXPECT_TRUE(timerSpy->WasRun());
 
   timer->Delete(&instance);
 }
