@@ -1,4 +1,4 @@
-﻿// Copyright(c) 2020 Ken Okabe
+// Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
 #ifndef SRC_UTKERNEL_TIMER_TIMER_PRIVATE_H_
 #define SRC_UTKERNEL_TIMER_TIMER_PRIVATE_H_
@@ -8,6 +8,7 @@
 typedef struct TimerStruct {
   int id;
   TimerDelegate timer;
+  TimerAbstractMethod impl;
 } TimerStruct;
 
 #endif  // SRC_UTKERNEL_TIMER_TIMER_PRIVATE_H_

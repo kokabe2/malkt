@@ -8,7 +8,7 @@ typedef struct TimerStruct* Timer;
 typedef struct {
   void (*Delete)(Timer* self);
   void (*Pause)(Timer self);
-  void (*Resume)(Timer self);
+  void (*Resume)(Timer self);  // Abstract method
 } TimerAbstractMethodStruct;
 typedef const TimerAbstractMethodStruct* TimerAbstractMethod;
 

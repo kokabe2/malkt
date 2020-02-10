@@ -1,4 +1,4 @@
-﻿// Copyright(c) 2020 Ken Okabe
+// Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
 #include "timer.h"
 
@@ -15,7 +15,7 @@ static void Pause(Timer self) {
   if (self) tk_stp_cyc(self->id);
 }
 static void Resume(Timer self) {
-  if (self) tk_sta_cyc(self->id);
+  if (self) self->impl->Resume(self);
 }
 static const TimerAbstractMethodStruct kTheMethod = {
     .Delete = Delete, .Pause = Pause, .Resume = Resume,
