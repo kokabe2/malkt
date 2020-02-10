@@ -3,6 +3,8 @@
 #ifndef SRC_UTKERNEL_TIMER_TIMER_PRIVATE_H_
 #define SRC_UTKERNEL_TIMER_TIMER_PRIVATE_H_
 
+#include <stdbool.h>
+
 #include "timer.h"
 
 typedef struct TimerStruct {
@@ -12,8 +14,8 @@ typedef struct TimerStruct {
 } TimerStruct;
 
 typedef struct {
-  Timer (*New)(TimerDelegate timer, int base_time_in_milliseconds,
-               void (*handler)(void* exinf), TimerAbstractMethod impl);
+  bool (*CreateTimer)(Timer self, int delay_in_milliseconds,
+                      int period_in_milliseconds, void (*handler)(void* exinf));
 } TimerPrivateMethodStruct;
 typedef const TimerPrivateMethodStruct* TimerPrivateMethod;
 
