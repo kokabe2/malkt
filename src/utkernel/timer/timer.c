@@ -6,7 +6,6 @@
 #include <stddef.h>
 
 #include "bleu/v1/heap.h"
-#include "null_timer.h"
 #include "timer_private.h"
 #include "utkernel/utkernel.h"
 
@@ -40,7 +39,7 @@ static const TimerPrivateMethodStruct kPrivateMethod = {
 const TimerPrivateMethod _timer = &kPrivateMethod;
 
 static void Delete(Timer* self) {
-  if (!self || !*self || *self == kNullTimer) return;
+  if (!self || !*self) return;
   tk_del_cyc((*self)->id);
   heap->Delete((void**)self);
 }

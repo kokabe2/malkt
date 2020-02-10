@@ -11,7 +11,6 @@ add_library(
     utkernel/memory_pool/memory_pool.c
     utkernel/task/task.c
     utkernel/timer/interval_timer.c
-    utkernel/timer/null_timer.c
     utkernel/timer/timer.c
     utkernel/uptime/uptime.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
@@ -31,7 +30,6 @@ add_executable(
     utkernel/task/utkernel_tsk_spy.c
     utkernel/task/task_test.cpp
     utkernel/timer/interval_timer_test.cpp
-    utkernel/timer/null_timer_test.cpp
     utkernel/timer/timer_spy.c
     utkernel/timer/utkernel_cyc_spy.c
     utkernel/uptime/utkernel_tim_fake.c
