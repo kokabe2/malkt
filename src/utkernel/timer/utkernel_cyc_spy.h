@@ -10,6 +10,7 @@ typedef struct {
   ATR (*Attribute)(void);
   RELTIM (*CycleTime)(void);
   RELTIM (*CyclePhase)(void);
+  void (*RunTimer)(void);
   void (*SetReturnCode)(int number, INT code);
 } UtkernelCycSpyMethodStruct;
 typedef const UtkernelCycSpyMethodStruct* UtkernelCycSpyMethod;
