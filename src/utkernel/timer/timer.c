@@ -3,11 +3,12 @@
 #include "timer.h"
 
 #include "bleu/v1/heap.h"
+#include "null_timer.h"
 #include "timer_private.h"
 #include "utkernel/utkernel.h"
 
 static void Delete(Timer* self) {
-  if (!self || !*self) return;
+  if (!self || !*self || *self == kNullTimer) return;
   tk_del_cyc((*self)->id);
   heap->Delete((void**)self);
 }
