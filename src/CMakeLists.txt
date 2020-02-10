@@ -27,6 +27,7 @@ add_executable(
     utkernel/task/function_entry_spy.c
     utkernel/task/utkernel_tsk_spy.c
     utkernel/task/task_test.cpp
+    utkernel/timer/timer_spy.c
     utkernel/uptime/utkernel_tim_fake.c
     utkernel/uptime/uptime_test.cpp
     utkernel/util/system_call_logger.c
