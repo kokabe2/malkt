@@ -14,6 +14,8 @@ mkdir %OUTPUT_DIR% > NUL 2>&1
            src/utkernel/isr/isr.c ^
            src/utkernel/memory_pool/memory_pool.c ^
            src/utkernel/task/task.c ^
+           src/utkernel/timer/interval_timer.c ^
+           src/utkernel/timer/timer.c ^
            src/utkernel/uptime/uptime.c
 if %errorlevel% neq 0 exit /b
 rlink -form=lib -output=%OUTPUT_DIR%/%PROJECT_NAME%.lib ^
