@@ -80,6 +80,15 @@ TEST_F(OneShotTimerTest, IsDone) {
   EXPECT_TRUE(oneShotTimer->IsDone(t));
 }
 
+TEST_F(OneShotTimerTest, RunTimerOnlyOnce) {
+  utkernelCycSpy->RunTimer();
+  timerSpy->Reset();
+
+  utkernelCycSpy->RunTimer();
+
+  EXPECT_FALSE(timerSpy->WasRun());
+}
+
 TEST_F(OneShotTimerTest, CallMethodWithNullInstance) {
   EXPECT_FALSE(oneShotTimer->IsDone(NULL));
 }
