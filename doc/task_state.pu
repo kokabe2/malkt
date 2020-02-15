@@ -1,5 +1,5 @@
 ﻿
-@startuml state machine diagram
+@startuml state_machine_diagram
 skinparam {
     defaultFontName Ricty Diminished
     monochrome true

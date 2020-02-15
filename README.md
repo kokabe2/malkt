@@ -20,3 +20,15 @@ Malkt is micro abstraction layered kernel task-based.
 - Inbox
 - Memory pool
 - ISR
+
+## Architecture
+
+### Task state
+
+![state machine diagram](doc/state_machine_diagram.svg)
+
+## Implementation
+
+### Class diagram
+
+![class diagram](doc/class_diagram.svg)

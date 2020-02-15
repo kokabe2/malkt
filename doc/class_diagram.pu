@@ -1,0 +1,80 @@
+﻿
+@startuml class_diagram
+skinparam {
+    defaultFontName Ricty Diminished
+    monochrome true
+}
+
+package Bleu {
+    folder heap {
+        class Heap {
+            + {static} New(int): void*
+            + {static} Delete(void**)
+        }
+    }
+}
+package Malkt {
+    folder uptime {
+        class Uptime {
+            + Get(): uint64_t
+        }
+    }
+    folder task {
+        class Task {
+            + New(ActionDelegate, int, int): Task
+            + Delete(Task*)
+            + Run(Task)
+            + Suspend(Task)
+            + Resume(Task)
+            + Delay(int)
+        }
+    }
+    folder timer {
+        abstract Timer {
+            # CreateTimer(Timer, int, int, void (*)(void*)): bool
+            + Delete(Timer*)
+            + Pause(Timer)
+            + Resume(Timer)
+        }
+        class IntervalTimer {
+            + New(TimerDelegate, int): Timer
+        }
+        class OneShotTimer {
+            + New(TimerDelegate, int): Timer
+        }
+    }
+    folder inbox {
+        class Inbox {
+            + New(int): Inbox
+            + Delete(Inbox*)
+            + Post(Inbox, const void*, int): bool
+            + BlockingPost(Inbox, const void*, int): bool
+            + Get(Inbox): void*
+            + BlockingGet(Inbox): void*
+        }
+    }
+    folder memory_pool {
+        class MemoryPool {
+            + New(void*, int, int): MemoryPool
+            + Delete(MemoryPool*)
+            + Get(MemoryPool): void*
+            + Release(MemoryPool, void*)
+        }
+    }
+    folder isr {
+        class Isr {
+            + New(int, InterruptDelegate): Isr
+            + Delete(Isr*)
+            + Enable(Isr, int)
+            + Disable(Isr)
+        }
+    }
+}
+Heap <-- Task
+Heap <-- Timer
+Timer <|-- IntervalTimer
+Timer <|-- OneShotTimer
+Heap <-- Inbox
+Heap <-- MemoryPool
+Heap <-- Isr
+@enduml
