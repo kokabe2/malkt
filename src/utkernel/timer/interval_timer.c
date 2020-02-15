@@ -2,7 +2,6 @@
 // This software is released under the MIT License, see LICENSE.
 #include "interval_timer.h"
 
-#include <stdbool.h>
 #include <stddef.h>
 
 #include "bleu/v1/heap.h"
