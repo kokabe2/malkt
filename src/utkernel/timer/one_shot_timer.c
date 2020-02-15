@@ -5,7 +5,7 @@
 #include <stddef.h>
 
 #include "bleu/v1/heap.h"
-#include "timer_private.h"
+#include "timer_protected.h"
 #include "utkernel/utkernel.h"
 
 typedef struct {

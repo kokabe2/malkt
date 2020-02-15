@@ -6,7 +6,7 @@
 #include <stddef.h>
 
 #include "bleu/v1/heap.h"
-#include "timer_private.h"
+#include "timer_protected.h"
 #include "utkernel/utkernel.h"
 
 static void Resume(Timer self) { tk_sta_cyc(self->id); }

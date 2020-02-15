@@ -3,7 +3,7 @@
 #include "timer.h"
 
 #include "bleu/v1/heap.h"
-#include "timer_private.h"
+#include "timer_protected.h"
 #include "utkernel/utkernel.h"
 
 static bool CreateTimer(Timer self, int delay_in_milliseconds,
@@ -16,10 +16,10 @@ static bool CreateTimer(Timer self, int delay_in_milliseconds,
                    .cycphs = (RELTIM)delay_in_milliseconds};
   return (self->id = tk_cre_cyc(&packet)) >= 0;
 }
-static const TimerPrivateMethodStruct kPrivateMethod = {
+static const TimerProtectedMethodStruct kProtectedMethod = {
     .CreateTimer = CreateTimer,
 };
-const TimerPrivateMethod _timer = &kPrivateMethod;
+const TimerProtectedMethod _timer = &kProtectedMethod;
 
 static void Delete(Timer* self) {
   if (!self || !*self) return;
