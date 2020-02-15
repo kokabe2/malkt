@@ -42,8 +42,9 @@ inline static bool CreateTask(Task self, int priority, int stack_size) {
   return (self->id = tk_cre_tsk(&packet)) >= 0;
 }
 static Task New(ActionDelegate action, int priority, int stack_size) {
-  if (!Validate(action, priority, stack_size)) return NULL;
-  Task self = (Task)heap->New(sizeof(TaskStruct));
+  Task self = Validate(action, priority, stack_size)
+                  ? (Task)heap->New(sizeof(TaskStruct))
+                  : NULL;
   if (!self) return self;
   self->action = action;
   if (!CreateTask(self, priority, stack_size)) heap->Delete((void**)&self);
@@ -69,11 +70,11 @@ static void Delete(Task* self) {
 static void Run(Task self) {
   if (self) tk_sta_tsk(self->id, 0);  // No need to care about error.
 }
+inline static bool IsSuspended(Task self) { return self->resume; }
 inline static void Sleep(Task self) {
   self->resume = tk_wup_tsk;
   tk_slp_tsk(TMO_FEVR);
 }
-inline static bool IsSuspended(Task self) { return self->resume; }
 inline static void SuspendOther(Task self) {
   self->resume = tk_rsm_tsk;
   tk_sus_tsk(self->id);

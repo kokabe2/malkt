@@ -25,8 +25,9 @@ inline static bool CreateMemoryPool(MemoryPool self, void* memory_area,
   return (self->id = tk_cre_mpf(&packet)) >= 0;
 }
 static MemoryPool New(void* memory_area, int capacity, int block_size) {
-  if (!Validate(memory_area, capacity, block_size)) return NULL;
-  MemoryPool self = (MemoryPool)heap->New(sizeof(MemoryPoolStruct));
+  MemoryPool self = Validate(memory_area, capacity, block_size)
+                        ? (MemoryPool)heap->New(sizeof(MemoryPoolStruct))
+                        : NULL;
   if (self && !CreateMemoryPool(self, memory_area, capacity, block_size))
     heap->Delete((void**)&self);
   return self;
