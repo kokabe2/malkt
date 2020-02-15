@@ -42,8 +42,9 @@ inline static bool CreateTask(Task self, int priority, int stack_size) {
   return (self->id = tk_cre_tsk(&packet)) >= 0;
 }
 static Task New(ActionDelegate action, int priority, int stack_size) {
-  if (!Validate(action, priority, stack_size)) return NULL;
-  Task self = (Task)heap->New(sizeof(TaskStruct));
+  Task self = Validate(action, priority, stack_size)
+                  ? (Task)heap->New(sizeof(TaskStruct))
+                  : NULL;
   if (!self) return self;
   self->action = action;
   if (!CreateTask(self, priority, stack_size)) heap->Delete((void**)&self);

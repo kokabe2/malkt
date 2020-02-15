@@ -32,8 +32,7 @@ inline static bool CreateInbox(Inbox self, int capacity) {
   return false;
 }
 static Inbox New(int capacity) {
-  if (!IsValid(capacity)) return NULL;
-  Inbox self = (Inbox)heap->New(sizeof(InboxStruct));
+  Inbox self = IsValid(capacity) ? (Inbox)heap->New(sizeof(InboxStruct)) : NULL;
   if (self && !CreateInbox(self, capacity)) heap->Delete((void**)&self);
   return self;
 }

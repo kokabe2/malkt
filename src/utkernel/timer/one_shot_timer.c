@@ -30,8 +30,9 @@ static void TimerEntry(void* exinf) {
   self->is_done = true;
 }
 static Timer New(TimerDelegate timer, int delay_in_milliseconds) {
-  if (!Validate(timer, delay_in_milliseconds)) return NULL;
-  OneShotTimer self = (OneShotTimer)heap->New(sizeof(OneShotTimerStruct));
+  OneShotTimer self = Validate(timer, delay_in_milliseconds)
+                          ? (OneShotTimer)heap->New(sizeof(OneShotTimerStruct))
+                          : NULL;
   if (!self) return (Timer)self;
   self->base.timer = timer;
   self->base.impl = &kConcreteMethod;
