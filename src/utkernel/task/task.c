@@ -69,11 +69,11 @@ static void Delete(Task* self) {
 static void Run(Task self) {
   if (self) tk_sta_tsk(self->id, 0);  // No need to care about error.
 }
+inline static bool IsSuspended(Task self) { return self->resume; }
 inline static void Sleep(Task self) {
   self->resume = tk_wup_tsk;
   tk_slp_tsk(TMO_FEVR);
 }
-inline static bool IsSuspended(Task self) { return self->resume; }
 inline static void SuspendOther(Task self) {
   self->resume = tk_rsm_tsk;
   tk_sus_tsk(self->id);
