@@ -2,6 +2,8 @@
 // This software is released under the MIT License, see LICENSE.
 #include "task_spy.h"
 
+#include <stddef.h>
+
 #include "task.h"
 
 typedef struct TaskStruct {
@@ -45,7 +47,10 @@ static Task New(ActionDelegate action, int priority, int stack_size) {
   ++new_called_count;
   return &task_dummy;
 }
-static void Delete(Task* self) { ++delete_called_count; }
+static void Delete(Task* self) {
+  ++delete_called_count;
+  if (self) *self == NULL;
+}
 static void Run(Task self) { ++run_called_count; }
 static void Suspend(Task self) { ++suspend_called_count; }
 static void Resume(Task self) { ++resume_called_count; }
