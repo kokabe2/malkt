@@ -39,7 +39,7 @@ static const TaskSpyMethodStruct kSpyMethod = {
     .ResumeCalledCount = ResumeCalledCount,
     .DelayCalledCount = DelayCalledCount,
 };
-const TaskSpyMethod task = &kSpyMethod;
+const TaskSpyMethod taskSpy = &kSpyMethod;
 
 static Task New(ActionDelegate action, int priority, int stack_size) {
   ++new_called_count;
