@@ -1,14 +1,14 @@
 // Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
-#include "timer_spy.h"
+#include "timer_handler_spy.h"
 
 static bool was_run;
 
-static void TimerFunction(void) { was_run = true; }
-static TimerDelegate Get(void) { return TimerFunction; }
+static void TimerHandler(void) { was_run = true; }
+static TimerDelegate Get(void) { return TimerHandler; }
 static void Reset(void) { was_run = false; }
 static bool WasRun(void) { return was_run; }
-static const TimerSpyMethodStruct kTheMethod = {
+static const TimerHandlerSpyMethodStruct kTheMethod = {
     .Get = Get, .Reset = Reset, .WasRun = WasRun,
 };
-const TimerSpyMethod timerSpy = &kTheMethod;
+const TimerHandlerSpyMethod timerHandlerSpy = &kTheMethod;

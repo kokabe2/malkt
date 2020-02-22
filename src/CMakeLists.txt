@@ -32,7 +32,7 @@ add_executable(
     utkernel/task/task_test.cpp
     utkernel/timer/interval_timer_test.cpp
     utkernel/timer/one_shot_timer_test.cpp
-    utkernel/timer/timer_spy.c
+    utkernel/timer/timer_handler_spy.c
     utkernel/timer/utkernel_cyc_spy.c
     utkernel/uptime/utkernel_tim_fake.c
     utkernel/uptime/uptime_test.cpp

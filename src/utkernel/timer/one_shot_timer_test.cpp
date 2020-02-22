@@ -5,7 +5,7 @@
 extern "C" {
 #include "../util/system_call_logger.h"
 #include "one_shot_timer.h"
-#include "timer_spy.h"
+#include "timer_handler_spy.h"
 #include "utkernel_cyc_spy.h"
 }
 
@@ -13,16 +13,16 @@ class OneShotTimerTest : public ::testing::Test {
  protected:
   Timer t;
   virtual void SetUp() {
-    timerSpy->Reset();
+    timerHandlerSpy->Reset();
     utkernelCycSpy->Reset();
-    t = oneShotTimer->New(timerSpy->Get(), 10);
+    t = oneShotTimer->New(timerHandlerSpy->Get(), 10);
     systemCallLogger->Reset();
   }
   virtual void TearDown() { timer->Delete(&t); }
 };
 
 TEST_F(OneShotTimerTest, New) {
-  Timer instance = oneShotTimer->New(timerSpy->Get(), 10);
+  Timer instance = oneShotTimer->New(timerHandlerSpy->Get(), 10);
 
   EXPECT_TRUE(instance != NULL);
   EXPECT_EQ((TA_HLNG | TA_STA | TA_PHS), utkernelCycSpy->Attribute());
@@ -33,9 +33,9 @@ TEST_F(OneShotTimerTest, New) {
       "- tk_cre_cyc (0)\n",
       systemCallLogger->Get());
 
-  EXPECT_FALSE(timerSpy->WasRun());
+  EXPECT_FALSE(timerHandlerSpy->WasRun());
   utkernelCycSpy->RunTimer();
-  EXPECT_TRUE(timerSpy->WasRun());
+  EXPECT_TRUE(timerHandlerSpy->WasRun());
 
   timer->Delete(&instance);
 }
@@ -43,7 +43,7 @@ TEST_F(OneShotTimerTest, New) {
 TEST_F(OneShotTimerTest, NewWhenTimerCreationFailed) {
   utkernelCycSpy->SetReturnCode(0, -34);
 
-  EXPECT_EQ(NULL, oneShotTimer->New(timerSpy->Get(), 10));
+  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), 10));
   EXPECT_STREQ(
       "+ tk_cre_cyc\n"
       "- tk_cre_cyc (-34)\n",
@@ -52,8 +52,8 @@ TEST_F(OneShotTimerTest, NewWhenTimerCreationFailed) {
 
 TEST_F(OneShotTimerTest, NewWithInvalidArgument) {
   EXPECT_EQ(NULL, oneShotTimer->New(NULL, 10));
-  EXPECT_EQ(NULL, oneShotTimer->New(timerSpy->Get(), 0));
-  EXPECT_EQ(NULL, oneShotTimer->New(timerSpy->Get(), -128));
+  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), 0));
+  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), -128));
   EXPECT_STREQ("", systemCallLogger->Get());
 }
 
@@ -82,11 +82,11 @@ TEST_F(OneShotTimerTest, IsDone) {
 
 TEST_F(OneShotTimerTest, RunTimerOnlyOnce) {
   utkernelCycSpy->RunTimer();
-  timerSpy->Reset();
+  timerHandlerSpy->Reset();
 
   utkernelCycSpy->RunTimer();
 
-  EXPECT_FALSE(timerSpy->WasRun());
+  EXPECT_FALSE(timerHandlerSpy->WasRun());
 }
 
 TEST_F(OneShotTimerTest, CallMethodWithNullInstance) {
