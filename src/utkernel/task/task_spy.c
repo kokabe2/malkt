@@ -49,7 +49,7 @@ static Task New(ActionDelegate action, int priority, int stack_size) {
 }
 static void Delete(Task* self) {
   ++delete_called_count;
-  if (self) *self == NULL;
+  if (self) *self = NULL;
 }
 static void Run(Task self) { ++run_called_count; }
 static void Suspend(Task self) { ++suspend_called_count; }
