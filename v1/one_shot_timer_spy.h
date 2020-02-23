@@ -10,6 +10,6 @@ typedef struct {
 } OneShotTimerSpyMethodStruct;
 typedef const OneShotTimerSpyMethodStruct* OneShotTimerSpyMethod;
 
-extern const OneShotTimerSpyMethod oneShottimerSpy;
+extern const OneShotTimerSpyMethod oneShotTimerSpy;
 
 #endif  // V1_ONE_SHOT_TIMER_SPY_H_
