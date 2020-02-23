@@ -31,4 +31,4 @@ static bool IsDone(Timer self) { return ((OneShotTimer)self)->is_done; }
 static const OneShotTimerMethodStruct kTheMethod = {
     .New = New, .IsDone = IsDone,
 };
-const OneShotTimerMethodStruct oneShotTimer = &kTheMethod;
+const OneShotTimerMethod oneShotTimer = &kTheMethod;
