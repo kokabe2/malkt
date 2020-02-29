@@ -19,37 +19,49 @@ typedef struct TaskStruct {
   ResumeDelegate resume;
 } TaskStruct;
 
-inline static bool Validate(ActionDelegate action, int priority, int stack_size) {
-  return action && priority >= kLowestTaskPriority && priority <= kHighestTaskPriority && stack_size > 0 &&
-         stack_size <= kMaxTaskStackSize;
-}
-
 static void TaskEntry(int unused, void* exinf) {
   Task self = (Task)exinf;
   self->action();
   tk_ext_tsk();
 }
 
-inline static int Reverse(int priority) { return kHighestTaskPriority - priority + kPriorityOffset; }
+inline static int LimitPriority(int priority) {
+  if (priority > kHighestTaskPriority)
+    return kHighestTaskPriority;
+  else if (priority < kLowestTaskPriority)
+    return kLowestTaskPriority;
+  else
+    return priority;
+}
 
-inline static bool CreateTask(Task self, int priority, int stack_size) {
+inline static int ReversePriority(int priority) { return kHighestTaskPriority - priority + kPriorityOffset; }
+
+inline static int AdjustPriority(int priority) {
+  int limited = LimitPriority(priority);
+  return ReversePriority(limited);
+}
+
+inline static int LimitStackSize(int stack_size) {
+  return stack_size > kMaxTaskStackSize ? kMaxTaskStackSize : stack_size;
+}
+
+inline static void CreateTask(Task self, int priority, int stack_size) {
   T_CTSK packet = {.exinf = (void*)self,
                    .tskatr = (TA_HLNG | TA_RNG0),
                    .task = (FP)TaskEntry,
-                   .itskpri = (PRI)Reverse(priority),
-                   .stksz = (SZ)stack_size};
-  return (self->id = tk_cre_tsk(&packet)) >= 0;
+                   .itskpri = (PRI)AdjustPriority(priority),
+                   .stksz = (SZ)LimitStackSize(stack_size)};
+  self->id = tk_cre_tsk(&packet);
 }
 
 static Task New(ActionDelegate action, int priority, int stack_size) {
-  Task self = Validate(action, priority, stack_size) ? (Task)heap->New(sizeof(TaskStruct)) : NULL;
-  if (!self) return self;
+  Task self = (Task)heap->New(sizeof(TaskStruct));
   self->action = action;
-  if (!CreateTask(self, priority, stack_size)) heap->Delete((void**)&self);
+  CreateTask(self, priority, stack_size);
   return self;
 }
 
-inline static bool IsMyself(int id) { return id == tk_get_tid(); }
+inline static bool IsMyself(Task self) { return self->id == tk_get_tid(); }
 
 inline static void KillMyself(Task* self) {
   heap->Delete((void**)self);
@@ -57,24 +69,21 @@ inline static void KillMyself(Task* self) {
 }
 
 inline static void KillOther(Task* self) {
-  tk_ter_tsk((*self)->id);  // No need to care about error.
+  tk_ter_tsk((*self)->id);
   tk_del_tsk((*self)->id);
   heap->Delete((void**)self);
 }
 
 static void Delete(Task* self) {
-  if (!self || !(*self)) return;
-  if (IsMyself((*self)->id))
+  if (IsMyself(*self))
     KillMyself(self);
   else
     KillOther(self);
 }
 
-static void Run(Task self) {
-  if (self) tk_sta_tsk(self->id, 0);  // No need to care about error.
-}
+static void Run(Task self) { tk_sta_tsk(self->id, 0); }
 
-inline static bool IsSuspended(Task self) { return self->resume; }
+inline static bool IsSuspended(Task self) { return self->resume != NULL; }
 
 inline static void Sleep(Task self) {
   self->resume = tk_wup_tsk;
@@ -88,23 +97,23 @@ inline static void SuspendOther(Task self) {
 }
 
 static void Suspend(Task self) {
-  if (!self || IsSuspended(self)) return;
-  if (IsMyself(self->id))
+  if (IsSuspended(self)) return;
+
+  if (IsMyself(self))
     Sleep(self);
   else
     SuspendOther(self);
 }
 
 static void Resume(Task self) {
-  if (!self || !IsSuspended(self)) return;
-  ResumeDelegate resume = self->resume;
-  self->resume = NULL;
-  resume(self->id);
+  if (IsSuspended(self)) {
+    ResumeDelegate resume = self->resume;
+    self->resume = NULL;
+    resume(self->id);
+  }
 }
 
-static void Delay(int time_in_milliseconds) {
-  if (time_in_milliseconds > 0) tk_dly_tsk(time_in_milliseconds);
-}
+static void Delay(int time_in_milliseconds) { tk_dly_tsk(time_in_milliseconds); }
 
 static const TaskMethodStruct kTheMethod = {
     .New = New, .Delete = Delete, .Run = Run, .Suspend = Suspend, .Resume = Resume, .Delay = Delay,

@@ -20,7 +20,9 @@ class TaskTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { task->Delete(&t); }
+  virtual void TearDown() {
+    if (t != NULL) task->Delete(&t);
+  }
 };
 
 TEST_F(TaskTest, New) {
@@ -49,23 +51,22 @@ TEST_F(TaskTest, NewWithBoundaryPriority) {
   task->Delete(&lowest_priority);
 }
 
-TEST_F(TaskTest, NewWhenTaskCreationFailed) {
-  utkernelTskSpy->SetReturnCode(0, -34);
+TEST_F(TaskTest, NewWithOutRangeOfPriority) {
+  Task highest_priority = task->New(functionEntrySpy->Get(), kHighestTaskPriority + 1, kMaxTaskStackSize);
+  EXPECT_EQ(5, utkernelTskSpy->Priority());
+  task->Delete(&highest_priority);
 
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize));
-  EXPECT_STREQ(
-      "+ tk_cre_tsk\n"
-      "- tk_cre_tsk (-34)\n",
-      systemCallLogger->Get());
+  Task lowest_priority = task->New(functionEntrySpy->Get(), kLowestTaskPriority - 1, kMaxTaskStackSize);
+  EXPECT_EQ(12, utkernelTskSpy->Priority());
+  task->Delete(&lowest_priority);
 }
 
-TEST_F(TaskTest, NewWithInvalidArguments) {
-  EXPECT_EQ(NULL, task->New(NULL, 4, kMaxTaskStackSize));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), kLowestTaskPriority - 1, kMaxTaskStackSize));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), kHighestTaskPriority + 1, kMaxTaskStackSize));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, 0));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize + 1));
-  EXPECT_STREQ("", systemCallLogger->Get());
+TEST_F(TaskTest, NewWithOutRangeOfStackSize) {
+  Task instance = task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize + 1);
+
+  EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
+
+  task->Delete(&instance);
 }
 
 TEST_F(TaskTest, DeleteSelfTask) {
@@ -94,15 +95,6 @@ TEST_F(TaskTest, DeleteOtherTask) {
       "+ tk_del_tsk (0)\n"
       "- tk_del_tsk (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(TaskTest, DeleteMultipleTimes) {
-  task->Delete(&t);
-  systemCallLogger->Reset();
-
-  task->Delete(&t);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(TaskTest, Run) {
@@ -210,20 +202,4 @@ TEST_F(TaskTest, Delay) {
       "+ tk_dly_tsk\n"
       "- tk_dly_tsk (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(TaskTest, DelayWithTimeZeroOrLess) {
-  task->Delay(0);
-  task->Delay(-100);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
-TEST_F(TaskTest, CallMethodWithNullInstance) {
-  task->Delete(NULL);
-  task->Run(NULL);
-  task->Suspend(NULL);
-  task->Resume(NULL);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
