@@ -17,11 +17,11 @@ static void TimerEntry(void* exinf) {
   self->timer();
 }
 
-static Timer New(TimerDelegate timer, int period_in_milliseconds) {
+static Timer New(TimerDelegate timer, int milliseconds) {
   Timer self = (Timer)heap->New(sizeof(TimerStruct));
   self->timer = timer;
   self->impl = &kConcreteMethod;
-  _timer->CreateTimer(self, period_in_milliseconds, period_in_milliseconds, TimerEntry);
+  _timer->CreateTimer(self, milliseconds, milliseconds, TimerEntry);
   return self;
 }
 
