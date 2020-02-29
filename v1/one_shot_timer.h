@@ -8,7 +8,7 @@
 #include "timer.h"
 
 typedef struct {
-  Timer (*New)(TimerDelegate timer, int delay_in_milliseconds);
+  Timer (*New)(TimerDelegate timer, int milliseconds);  // Use Timer::Delete() when delete instance.
   bool (*IsDone)(Timer self);  // Never use anything other than OneShotTimer.
 } OneShotTimerMethodStruct;
 typedef const OneShotTimerMethodStruct* OneShotTimerMethod;

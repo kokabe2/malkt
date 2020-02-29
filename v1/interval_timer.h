@@ -6,7 +6,7 @@
 #include "timer.h"
 
 typedef struct {
-  Timer (*New)(TimerDelegate timer, int period_in_milliseconds);
+  Timer (*New)(TimerDelegate timer, int milliseconds);  // Use Timer::Delete() when delete instance.
 } IntervalTimerMethodStruct;
 typedef const IntervalTimerMethodStruct* IntervalTimerMethod;
 

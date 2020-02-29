@@ -20,7 +20,9 @@ class OneShotTimerTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { timer->Delete(&t); }
+  virtual void TearDown() {
+    if (t != NULL) timer->Delete(&t);
+  }
 };
 
 TEST_F(OneShotTimerTest, New) {
@@ -40,23 +42,6 @@ TEST_F(OneShotTimerTest, New) {
   EXPECT_TRUE(timerHandlerSpy->WasRun());
 
   timer->Delete(&instance);
-}
-
-TEST_F(OneShotTimerTest, NewWhenTimerCreationFailed) {
-  utkernelCycSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), 10));
-  EXPECT_STREQ(
-      "+ tk_cre_cyc\n"
-      "- tk_cre_cyc (-34)\n",
-      systemCallLogger->Get());
-}
-
-TEST_F(OneShotTimerTest, NewWithInvalidArgument) {
-  EXPECT_EQ(NULL, oneShotTimer->New(NULL, 10));
-  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), 0));
-  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), -128));
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(OneShotTimerTest, ResumeWhenTimerIsNotDone) {
@@ -90,5 +75,3 @@ TEST_F(OneShotTimerTest, RunTimerOnlyOnce) {
 
   EXPECT_FALSE(timerHandlerSpy->WasRun());
 }
-
-TEST_F(OneShotTimerTest, CallMethodWithNullInstance) { EXPECT_FALSE(oneShotTimer->IsDone(NULL)); }

@@ -6,14 +6,14 @@
 #include "timer_protected.h"
 #include "utkernel/utkernel.h"
 
-static bool CreateTimer(Timer self, int delay_in_milliseconds, int period_in_milliseconds,
+static void CreateTimer(Timer self, int delay_in_milliseconds, int period_in_milliseconds,
                         void (*handler)(void* exinf)) {
   T_CCYC packet = {.exinf = self,
                    .cycatr = TA_HLNG | TA_STA | TA_PHS,
                    .cychdr = (FP)handler,
                    .cyctim = (RELTIM)period_in_milliseconds,
                    .cycphs = (RELTIM)delay_in_milliseconds};
-  return (self->id = tk_cre_cyc(&packet)) >= 0;
+  self->id = tk_cre_cyc(&packet);
 }
 
 static const TimerProtectedMethodStruct kProtectedMethod = {
@@ -23,18 +23,13 @@ static const TimerProtectedMethodStruct kProtectedMethod = {
 const TimerProtectedMethod _timer = &kProtectedMethod;
 
 static void Delete(Timer* self) {
-  if (!self || !*self) return;
   tk_del_cyc((*self)->id);
   heap->Delete((void**)self);
 }
 
-static void Pause(Timer self) {
-  if (self) tk_stp_cyc(self->id);
-}
+static void Pause(Timer self) { tk_stp_cyc(self->id); }
 
-static void Resume(Timer self) {
-  if (self) self->impl->Resume(self);
-}
+static void Resume(Timer self) { self->impl->Resume(self); }
 
 static const TimerAbstractMethodStruct kTheMethod = {
     .Delete = Delete, .Pause = Pause, .Resume = Resume,

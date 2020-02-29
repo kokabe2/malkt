@@ -2,8 +2,6 @@
 // This software is released under the MIT License, see LICENSE.
 #include "one_shot_timer.h"
 
-#include <stddef.h>
-
 #include "bleu/v1/heap.h"
 #include "timer_protected.h"
 #include "utkernel/utkernel.h"
@@ -15,36 +13,33 @@ typedef struct {
 
 inline static OneShotTimer Downcast(Timer self) { return (OneShotTimer)self; }
 
+inline static bool IsDone(Timer self) { return Downcast(self)->is_done; }
+
 static void Resume(Timer self) {
-  if (!Downcast(self)->is_done) tk_sta_cyc(self->id);
+  if (!IsDone(self)) tk_sta_cyc(self->id);
 }
 
 static const TimerAbstractMethodStruct kConcreteMethod = {
     .Resume = Resume,
 };
 
-inline static bool Validate(TimerDelegate timer, int delay_in_milliseconds) {
-  return timer && delay_in_milliseconds > 0;
-}
+inline static void Done(Timer self) { Downcast(self)->is_done = true; }
 
 static void TimerEntry(void* exinf) {
-  OneShotTimer self = (OneShotTimer)exinf;
-  if (self->is_done) return;
-  self->base.timer();
-  self->is_done = true;
+  Timer self = (Timer)exinf;
+  if (!IsDone(self)) {
+    self->timer();
+    Done(self);
+  }
 }
 
-static Timer New(TimerDelegate timer, int delay_in_milliseconds) {
-  OneShotTimer self =
-      Validate(timer, delay_in_milliseconds) ? (OneShotTimer)heap->New(sizeof(OneShotTimerStruct)) : NULL;
-  if (!self) return (Timer)self;
-  self->base.timer = timer;
-  self->base.impl = &kConcreteMethod;
-  if (!_timer->CreateTimer((Timer)self, delay_in_milliseconds, ~0, TimerEntry)) heap->Delete((void**)&self);
-  return (Timer)self;
+static Timer New(TimerDelegate timer, int milliseconds) {
+  Timer self = (Timer)heap->New(sizeof(OneShotTimerStruct));
+  self->timer = timer;
+  self->impl = &kConcreteMethod;
+  _timer->CreateTimer(self, milliseconds, ~0, TimerEntry);
+  return self;
 }
-
-static bool IsDone(Timer self) { return self ? Downcast(self)->is_done : false; }
 
 static const OneShotTimerMethodStruct kTheMethod = {
     .New = New, .IsDone = IsDone,
