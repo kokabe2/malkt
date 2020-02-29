@@ -13,7 +13,7 @@ typedef struct MemoryPoolStruct {
 } MemoryPoolStruct;
 
 inline static void CreateMemoryPool(MemoryPool self, void* memory_area, int capacity, int block_size) {
-  T_CMPF packet = {.mpfatr = (TA_TFIFO | TA_RNG0 | TA_USERBUF),
+  T_CMPF packet = {.mpfatr = TA_TFIFO | TA_RNG0 | TA_USERBUF,
                    .mpfcnt = capacity / block_size,
                    .blfsz = block_size,
                    .bufptr = memory_area};
