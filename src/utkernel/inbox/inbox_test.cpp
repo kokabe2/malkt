@@ -16,12 +16,14 @@ char kDummyMessage[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 class InboxTest : public ::testing::Test {
  protected:
   Inbox i;
+
   virtual void SetUp() {
     utkernelMbxSpy->Reset();
     utkernelMplSpy->Reset();
     i = inbox->New(1024);
     systemCallLogger->Reset();
   }
+
   virtual void TearDown() { inbox->Delete(&i); }
 };
 

@@ -12,12 +12,14 @@ extern "C" {
 class IntervalTimerTest : public ::testing::Test {
  protected:
   Timer t;
+
   virtual void SetUp() {
     timerHandlerSpy->Reset();
     utkernelCycSpy->Reset();
     t = intervalTimer->New(timerHandlerSpy->Get(), 10);
     systemCallLogger->Reset();
   }
+
   virtual void TearDown() { timer->Delete(&t); }
 };
 

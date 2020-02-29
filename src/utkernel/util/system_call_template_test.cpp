@@ -10,6 +10,7 @@ extern "C" {
 namespace {
 bool was_run;
 const void* given_info;
+
 void ExecuteSpy(const void* info) {
   was_run = true;
   given_info = info;
@@ -23,6 +24,7 @@ class SystemCallTemplateTest : public ::testing::Test {
     was_run = false;
     given_info = NULL;
   }
+
   virtual void TearDown() {}
 };
 

@@ -15,11 +15,13 @@ void InterruptDummy(int intno) {}
 class IsrTest : public ::testing::Test {
  protected:
   Isr i;
+
   virtual void SetUp() {
     utkernelIntSpy->Reset();
     i = isr->New(24, InterruptDummy);
     systemCallLogger->Reset();
   }
+
   virtual void TearDown() { isr->Delete(&i); }
 };
 

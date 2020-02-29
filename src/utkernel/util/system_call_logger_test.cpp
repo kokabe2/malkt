@@ -9,6 +9,7 @@ extern "C" {
 class SystemCallLoggerTest : public ::testing::Test {
  protected:
   virtual void SetUp() { systemCallLogger->Reset(); }
+
   virtual void TearDown() {}
 };
 

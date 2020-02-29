@@ -16,11 +16,13 @@ char memory_area[512 + 1];
 class MemoryPoolTest : public ::testing::Test {
  protected:
   MemoryPool mp;
+
   virtual void SetUp() {
     utkernelMpfSpy->Reset();
     mp = memoryPool->New(memory_area, sizeof(memory_area), 32);
     systemCallLogger->Reset();
   }
+
   virtual void TearDown() { memoryPool->Delete(&mp); }
 };
 

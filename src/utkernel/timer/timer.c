@@ -15,9 +15,11 @@ static bool CreateTimer(Timer self, int delay_in_milliseconds, int period_in_mil
                    .cycphs = (RELTIM)delay_in_milliseconds};
   return (self->id = tk_cre_cyc(&packet)) >= 0;
 }
+
 static const TimerProtectedMethodStruct kProtectedMethod = {
     .CreateTimer = CreateTimer,
 };
+
 const TimerProtectedMethod _timer = &kProtectedMethod;
 
 static void Delete(Timer* self) {
@@ -25,13 +27,17 @@ static void Delete(Timer* self) {
   tk_del_cyc((*self)->id);
   heap->Delete((void**)self);
 }
+
 static void Pause(Timer self) {
   if (self) tk_stp_cyc(self->id);
 }
+
 static void Resume(Timer self) {
   if (self) self->impl->Resume(self);
 }
+
 static const TimerAbstractMethodStruct kTheMethod = {
     .Delete = Delete, .Pause = Pause, .Resume = Resume,
 };
+
 const TimerAbstractMethod timer = &kTheMethod;

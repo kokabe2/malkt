@@ -12,12 +12,14 @@ extern "C" {
 class TaskTest : public ::testing::Test {
  protected:
   Task t;
+
   virtual void SetUp() {
     functionEntrySpy->Reset();
     utkernelTskSpy->Reset();
     t = task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize);
     systemCallLogger->Reset();
   }
+
   virtual void TearDown() { task->Delete(&t); }
 };
 
