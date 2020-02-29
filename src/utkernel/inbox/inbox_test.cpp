@@ -24,7 +24,9 @@ class InboxTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { inbox->Delete(&i); }
+  virtual void TearDown() {
+    if (i != NULL) inbox->Delete(&i);
+  }
 };
 
 TEST_F(InboxTest, New) {
@@ -85,15 +87,6 @@ TEST_F(InboxTest, Delete) {
       "+ tk_del_mpl (0)\n"
       "- tk_del_mpl (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(InboxTest, DeleteMultipleTimes) {
-  inbox->Delete(&i);
-  systemCallLogger->Reset();
-
-  inbox->Delete(&i);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(InboxTest, Post) {
@@ -189,14 +182,4 @@ TEST_F(InboxTest, BlockingGet) {
       "+ tk_rcv_mbx (0)\n"
       "- tk_rcv_mbx (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(InboxTest, CallMethodWithNullInstance) {
-  inbox->Delete(NULL);
-  EXPECT_FALSE(inbox->Post(NULL, kDummyMessage, 1));
-  EXPECT_FALSE(inbox->BlockingPost(NULL, kDummyMessage, 1));
-  EXPECT_EQ(NULL, inbox->Get(NULL));
-  EXPECT_EQ(NULL, inbox->BlockingGet(NULL));
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }

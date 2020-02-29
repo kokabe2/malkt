@@ -38,7 +38,6 @@ static Inbox New(int capacity) {
 }
 
 static void Delete(Inbox* self) {
-  if (!self || !(*self)) return;
   tk_del_mbx((*self)->mbx_id);
   tk_del_mpl((*self)->mpl_id);
   heap->Delete((void**)self);
@@ -49,7 +48,7 @@ inline static bool Validate(const void* message, int size) { return message && s
 inline static void SendMail(Inbox self, void* mail) { tk_snd_mbx(self->mbx_id, (T_MSG*)mail); }
 
 inline static bool PostTemplate(Inbox self, const void* message, int size, ComposeDelegate compose) {
-  if (!self || !Validate(message, size)) return false;
+  if (!Validate(message, size)) return false;
   void* mail = compose(self, message, size);
   if (mail) SendMail(self, mail);
   return mail;
@@ -89,7 +88,6 @@ inline static void DeleteLastMailIfNeeded(Inbox self) {
 }
 
 inline static void* GetTemplate(Inbox self, GetDelegate get) {
-  if (!self) return NULL;
   DeleteLastMailIfNeeded(self);
   return get(self) ? ExtractMessage(self->last_mail) : NULL;
 }
