@@ -15,6 +15,7 @@ add_library(
     utkernel/timer/timer.c
     utkernel/uptime/uptime.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
+    ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/heap_usage.c
     )
 
 add_executable(
