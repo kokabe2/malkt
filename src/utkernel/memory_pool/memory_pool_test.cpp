@@ -44,16 +44,6 @@ TEST_F(MemoryPoolTest, New) {
   memoryPool->Delete(&instance);
 }
 
-TEST_F(MemoryPoolTest, NewWhenMemoryPoolCreationFailed) {
-  utkernelMpfSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), 32));
-  EXPECT_STREQ(
-      "+ tk_cre_mpf\n"
-      "- tk_cre_mpf (-34)\n",
-      systemCallLogger->Get());
-}
-
 TEST_F(MemoryPoolTest, Delete) {
   memoryPool->Delete(&mp);
 

@@ -12,17 +12,17 @@ typedef struct MemoryPoolStruct {
   int id;  //
 } MemoryPoolStruct;
 
-inline static bool CreateMemoryPool(MemoryPool self, void* memory_area, int capacity, int block_size) {
+inline static void CreateMemoryPool(MemoryPool self, void* memory_area, int capacity, int block_size) {
   T_CMPF packet = {.mpfatr = (TA_TFIFO | TA_RNG0 | TA_USERBUF),
                    .mpfcnt = capacity / block_size,
                    .blfsz = block_size,
                    .bufptr = memory_area};
-  return (self->id = tk_cre_mpf(&packet)) >= 0;
+  self->id = tk_cre_mpf(&packet);
 }
 
 static MemoryPool New(void* memory_area, int capacity, int block_size) {
   MemoryPool self = (MemoryPool)heap->New(sizeof(MemoryPoolStruct));
-  if (!CreateMemoryPool(self, memory_area, capacity, block_size)) heap->Delete((void**)&self);
+  CreateMemoryPool(self, memory_area, capacity, block_size);
   return self;
 }
 
