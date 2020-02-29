@@ -54,16 +54,6 @@ TEST_F(MemoryPoolTest, NewWhenMemoryPoolCreationFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(MemoryPoolTest, NewWithInvalidArgument) {
-  EXPECT_EQ(NULL, memoryPool->New(NULL, sizeof(memory_area), 32));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, 0, 32));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, -128, 32));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), 0));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), -8));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), sizeof(memory_area) + 1));
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(MemoryPoolTest, Delete) {
   memoryPool->Delete(&mp);
 
@@ -103,10 +93,4 @@ TEST_F(MemoryPoolTest, Release) {
       "+ tk_rel_mpf (0)\n"
       "- tk_rel_mpf (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(MemoryPoolTest, ReleaseWithInvalidArgument) {
-  memoryPool->Release(mp, NULL);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
