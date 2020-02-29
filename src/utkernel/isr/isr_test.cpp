@@ -51,12 +51,6 @@ TEST_F(IsrTest, NewWhenInterruptDefinitionFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(IsrTest, NewWithInvelidArgument) {
-  EXPECT_EQ(NULL, isr->New(-1, InterruptDummy));
-  EXPECT_EQ(NULL, isr->New(24, NULL));
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(IsrTest, Delete) {
   isr->Delete(&i);
 
@@ -78,12 +72,6 @@ TEST_F(IsrTest, Enable) {
       "+ EnableInt (24)\n"
       "- EnableInt\n",
       systemCallLogger->Get());
-}
-
-TEST_F(IsrTest, EnableWithInvalidArgument) {
-  isr->Enable(i, -1);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(IsrTest, Disable) {
