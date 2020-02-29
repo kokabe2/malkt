@@ -203,10 +203,3 @@ TEST_F(TaskTest, Delay) {
       "- tk_dly_tsk (0)\n",
       systemCallLogger->Get());
 }
-
-TEST_F(TaskTest, DelayWithTimeZeroOrLess) {
-  task->Delay(0);
-  task->Delay(-100);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
-}

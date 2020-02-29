@@ -113,9 +113,7 @@ static void Resume(Task self) {
   resume(self->id);
 }
 
-static void Delay(int time_in_milliseconds) {
-  if (time_in_milliseconds > 0) tk_dly_tsk(time_in_milliseconds);
-}
+static void Delay(int time_in_milliseconds) { tk_dly_tsk(time_in_milliseconds); }
 
 static const TaskMethodStruct kTheMethod = {
     .New = New, .Delete = Delete, .Run = Run, .Suspend = Suspend, .Resume = Resume, .Delay = Delay,
