@@ -69,16 +69,6 @@ TEST_F(TaskTest, NewWithOutRangeOfStackSize) {
   task->Delete(&instance);
 }
 
-TEST_F(TaskTest, NewWhenTaskCreationFailed) {
-  utkernelTskSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize));
-  EXPECT_STREQ(
-      "+ tk_cre_tsk\n"
-      "- tk_cre_tsk (-34)\n",
-      systemCallLogger->Get());
-}
-
 TEST_F(TaskTest, DeleteSelfTask) {
   task->Delete(&t);
 

@@ -45,19 +45,19 @@ inline static int LimitStackSize(int stack_size) {
   return stack_size > kMaxTaskStackSize ? kMaxTaskStackSize : stack_size;
 }
 
-inline static bool CreateTask(Task self, int priority, int stack_size) {
+inline static void CreateTask(Task self, int priority, int stack_size) {
   T_CTSK packet = {.exinf = (void*)self,
                    .tskatr = (TA_HLNG | TA_RNG0),
                    .task = (FP)TaskEntry,
                    .itskpri = (PRI)AdjustPriority(priority),
                    .stksz = (SZ)LimitStackSize(stack_size)};
-  return (self->id = tk_cre_tsk(&packet)) >= 0;
+  self->id = tk_cre_tsk(&packet);
 }
 
 static Task New(ActionDelegate action, int priority, int stack_size) {
   Task self = (Task)heap->New(sizeof(TaskStruct));
   self->action = action;
-  if (!CreateTask(self, priority, stack_size)) heap->Delete((void**)&self);
+  CreateTask(self, priority, stack_size);
   return self;
 }
 
