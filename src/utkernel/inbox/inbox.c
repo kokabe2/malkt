@@ -18,13 +18,13 @@ typedef struct InboxStruct {
 
 static const int kHeaderSize = sizeof(T_MSG);
 
-inline static bool IsValid(int capacity) { return capacity > 0 && capacity <= kMaxInboxCapacity; }
+inline static int LimitCapacity(int capacity) { return capacity > kMaxInboxCapacity ? kMaxInboxCapacity : capacity; }
 
 inline static bool CreateInbox(Inbox self, int capacity) {
   T_CMBX mbx_packet = {.mbxatr = (TA_TFIFO | TA_MFIFO)};
   if ((self->mbx_id = tk_cre_mbx(&mbx_packet)) < 0) return false;
 
-  T_CMPL mpl_packet = {.mplatr = (TA_TFIFO | TA_RNG0), .mplsz = capacity};
+  T_CMPL mpl_packet = {.mplatr = (TA_TFIFO | TA_RNG0), .mplsz = LimitCapacity(capacity)};
   if ((self->mpl_id = tk_cre_mpl(&mpl_packet)) >= 0) return true;
 
   tk_del_mbx(self->mbx_id);
@@ -32,8 +32,8 @@ inline static bool CreateInbox(Inbox self, int capacity) {
 }
 
 static Inbox New(int capacity) {
-  Inbox self = IsValid(capacity) ? (Inbox)heap->New(sizeof(InboxStruct)) : NULL;
-  if (self && !CreateInbox(self, capacity)) heap->Delete((void**)&self);
+  Inbox self = (Inbox)heap->New(sizeof(InboxStruct));
+  if (!CreateInbox(self, capacity)) heap->Delete((void**)&self);
   return self;
 }
 

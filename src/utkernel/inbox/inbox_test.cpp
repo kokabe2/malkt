@@ -70,11 +70,12 @@ TEST_F(InboxTest, NewWhenMemoryPoolCreationFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, NewWithInvalidArguments) {
-  EXPECT_EQ(NULL, inbox->New(0));
-  EXPECT_EQ(NULL, inbox->New(-128));
-  EXPECT_EQ(NULL, inbox->New(kMaxInboxCapacity + 1));
-  EXPECT_STREQ("", systemCallLogger->Get());
+TEST_F(InboxTest, NewWithOutRangeOfCapacity) {
+  Inbox instance = inbox->New(kMaxInboxCapacity + 1);
+
+  EXPECT_EQ(kMaxInboxCapacity, utkernelMplSpy->Capacity());
+
+  inbox->Delete(&instance);
 }
 
 TEST_F(InboxTest, Delete) {
