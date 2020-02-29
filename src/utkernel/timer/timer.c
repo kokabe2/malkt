@@ -23,18 +23,13 @@ static const TimerProtectedMethodStruct kProtectedMethod = {
 const TimerProtectedMethod _timer = &kProtectedMethod;
 
 static void Delete(Timer* self) {
-  if (!self || !*self) return;
   tk_del_cyc((*self)->id);
   heap->Delete((void**)self);
 }
 
-static void Pause(Timer self) {
-  if (self) tk_stp_cyc(self->id);
-}
+static void Pause(Timer self) { tk_stp_cyc(self->id); }
 
-static void Resume(Timer self) {
-  if (self) self->impl->Resume(self);
-}
+static void Resume(Timer self) { self->impl->Resume(self); }
 
 static const TimerAbstractMethodStruct kTheMethod = {
     .Delete = Delete, .Pause = Pause, .Resume = Resume,

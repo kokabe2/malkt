@@ -20,7 +20,9 @@ class IntervalTimerTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { timer->Delete(&t); }
+  virtual void TearDown() {
+    if (t != NULL) timer->Delete(&t);
+  }
 };
 
 TEST_F(IntervalTimerTest, New) {
@@ -69,15 +71,6 @@ TEST_F(IntervalTimerTest, Delete) {
       systemCallLogger->Get());
 }
 
-TEST_F(IntervalTimerTest, DeleteMultipleTimes) {
-  timer->Delete(&t);
-  systemCallLogger->Reset();
-
-  timer->Delete(&t);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(IntervalTimerTest, Pause) {
   timer->Pause(t);
 
@@ -94,12 +87,4 @@ TEST_F(IntervalTimerTest, Resume) {
       "+ tk_sta_cyc (0)\n"
       "- tk_sta_cyc (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(IntervalTimerTest, CallMethodWithNullInstance) {
-  timer->Delete(NULL);
-  timer->Pause(NULL);
-  timer->Resume(NULL);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }

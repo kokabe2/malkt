@@ -20,7 +20,9 @@ class OneShotTimerTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { timer->Delete(&t); }
+  virtual void TearDown() {
+    if (t != NULL) timer->Delete(&t);
+  }
 };
 
 TEST_F(OneShotTimerTest, New) {
@@ -90,5 +92,3 @@ TEST_F(OneShotTimerTest, RunTimerOnlyOnce) {
 
   EXPECT_FALSE(timerHandlerSpy->WasRun());
 }
-
-TEST_F(OneShotTimerTest, CallMethodWithNullInstance) { EXPECT_FALSE(oneShotTimer->IsDone(NULL)); }

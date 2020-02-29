@@ -44,7 +44,7 @@ static Timer New(TimerDelegate timer, int delay_in_milliseconds) {
   return (Timer)self;
 }
 
-static bool IsDone(Timer self) { return self ? Downcast(self)->is_done : false; }
+static bool IsDone(Timer self) { return Downcast(self)->is_done; }
 
 static const OneShotTimerMethodStruct kTheMethod = {
     .New = New, .IsDone = IsDone,
