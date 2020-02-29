@@ -22,7 +22,9 @@ class IsrTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { isr->Delete(&i); }
+  virtual void TearDown() {
+    if (i != NULL) isr->Delete(&i);
+  }
 };
 
 TEST_F(IsrTest, New) {
@@ -39,22 +41,6 @@ TEST_F(IsrTest, New) {
   isr->Delete(&instance);
 }
 
-TEST_F(IsrTest, NewWhenInterruptDefinitionFailed) {
-  utkernelIntSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, isr->New(24, InterruptDummy));
-  EXPECT_STREQ(
-      "+ tk_def_int (24)\n"
-      "- tk_def_int (-34)\n",
-      systemCallLogger->Get());
-}
-
-TEST_F(IsrTest, NewWithInvelidArgument) {
-  EXPECT_EQ(NULL, isr->New(-1, InterruptDummy));
-  EXPECT_EQ(NULL, isr->New(24, NULL));
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(IsrTest, Delete) {
   isr->Delete(&i);
 
@@ -68,15 +54,6 @@ TEST_F(IsrTest, Delete) {
       systemCallLogger->Get());
 }
 
-TEST_F(IsrTest, DeleteMultipleTimes) {
-  isr->Delete(&i);
-  systemCallLogger->Reset();
-
-  isr->Delete(&i);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(IsrTest, Enable) {
   isr->Enable(i, 4);
 
@@ -85,12 +62,6 @@ TEST_F(IsrTest, Enable) {
       "+ EnableInt (24)\n"
       "- EnableInt\n",
       systemCallLogger->Get());
-}
-
-TEST_F(IsrTest, EnableWithInvalidArgument) {
-  isr->Enable(i, -1);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(IsrTest, Disable) {
@@ -103,12 +74,4 @@ TEST_F(IsrTest, Disable) {
       "+ DisableInt (24)\n"
       "- DisableInt\n",
       systemCallLogger->Get());
-}
-
-TEST_F(IsrTest, DestroyWithNull) {
-  isr->Delete(NULL);
-  isr->Enable(NULL, 4);
-  isr->Disable(NULL);
-
-  SUCCEED();
 }
