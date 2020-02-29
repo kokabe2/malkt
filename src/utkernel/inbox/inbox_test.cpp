@@ -89,13 +89,6 @@ TEST_F(InboxTest, PostWhenMemoryBlockAcquisitionFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, PostWithInvalidArguments) {
-  EXPECT_FALSE(inbox->Post(i, kDummyMessage, 0));
-  EXPECT_FALSE(inbox->Post(i, kDummyMessage, -16));
-  EXPECT_FALSE(inbox->Post(i, NULL, 16));
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(InboxTest, BlockingPost) {
   EXPECT_TRUE(inbox->BlockingPost(i, kDummyMessage, sizeof(kDummyMessage)));
   EXPECT_EQ(0, memcmp(kDummyMessage, utkernelMbxSpy->LastMessage(), sizeof(kDummyMessage)));

@@ -43,12 +43,9 @@ static void Delete(Inbox* self) {
   heap->Delete((void**)self);
 }
 
-inline static bool Validate(const void* message, int size) { return message && size > 0; }
-
 inline static void SendMail(Inbox self, void* mail) { tk_snd_mbx(self->mbx_id, (T_MSG*)mail); }
 
 inline static bool PostTemplate(Inbox self, const void* message, int size, ComposeDelegate compose) {
-  if (!Validate(message, size)) return false;
   void* mail = compose(self, message, size);
   if (mail) SendMail(self, mail);
   return mail;
