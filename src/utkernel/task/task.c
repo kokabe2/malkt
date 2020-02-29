@@ -19,30 +19,42 @@ typedef struct TaskStruct {
   ResumeDelegate resume;
 } TaskStruct;
 
-inline static bool Validate(ActionDelegate action, int priority, int stack_size) {
-  return action && priority >= kLowestTaskPriority && priority <= kHighestTaskPriority && stack_size > 0 &&
-         stack_size <= kMaxTaskStackSize;
-}
-
 static void TaskEntry(int unused, void* exinf) {
   Task self = (Task)exinf;
   self->action();
   tk_ext_tsk();
 }
 
-inline static int Reverse(int priority) { return kHighestTaskPriority - priority + kPriorityOffset; }
+inline static int LimitPriority(int priority) {
+  if (priority > kHighestTaskPriority)
+    return kHighestTaskPriority;
+  else if (priority < kLowestTaskPriority)
+    return kLowestTaskPriority;
+  else
+    return priority;
+}
+
+inline static int ReversePriority(int priority) { return kHighestTaskPriority - priority + kPriorityOffset; }
+
+inline static int AdjustPriority(int priority) {
+  int limited = LimitPriority(priority);
+  return ReversePriority(limited);
+}
+
+inline static int LimitStackSize(int stack_size) {
+  return stack_size > kMaxTaskStackSize ? kMaxTaskStackSize : stack_size;
+}
 
 inline static bool CreateTask(Task self, int priority, int stack_size) {
   T_CTSK packet = {.exinf = (void*)self,
                    .tskatr = (TA_HLNG | TA_RNG0),
                    .task = (FP)TaskEntry,
-                   .itskpri = (PRI)Reverse(priority),
-                   .stksz = (SZ)stack_size};
+                   .itskpri = (PRI)AdjustPriority(priority),
+                   .stksz = (SZ)LimitStackSize(stack_size)};
   return (self->id = tk_cre_tsk(&packet)) >= 0;
 }
 
 static Task New(ActionDelegate action, int priority, int stack_size) {
-  if (!Validate(action, priority, stack_size)) return NULL;
   Task self = (Task)heap->New(sizeof(TaskStruct));
   self->action = action;
   if (!CreateTask(self, priority, stack_size)) heap->Delete((void**)&self);

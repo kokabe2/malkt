@@ -51,6 +51,24 @@ TEST_F(TaskTest, NewWithBoundaryPriority) {
   task->Delete(&lowest_priority);
 }
 
+TEST_F(TaskTest, NewWithOutRangeOfPriority) {
+  Task highest_priority = task->New(functionEntrySpy->Get(), kHighestTaskPriority + 1, kMaxTaskStackSize);
+  EXPECT_EQ(5, utkernelTskSpy->Priority());
+  task->Delete(&highest_priority);
+
+  Task lowest_priority = task->New(functionEntrySpy->Get(), kLowestTaskPriority - 1, kMaxTaskStackSize);
+  EXPECT_EQ(12, utkernelTskSpy->Priority());
+  task->Delete(&lowest_priority);
+}
+
+TEST_F(TaskTest, NewWithOutRangeOfStackSize) {
+  Task instance = task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize + 1);
+
+  EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
+
+  task->Delete(&instance);
+}
+
 TEST_F(TaskTest, NewWhenTaskCreationFailed) {
   utkernelTskSpy->SetReturnCode(0, -34);
 
@@ -59,15 +77,6 @@ TEST_F(TaskTest, NewWhenTaskCreationFailed) {
       "+ tk_cre_tsk\n"
       "- tk_cre_tsk (-34)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(TaskTest, NewWithInvalidArguments) {
-  EXPECT_EQ(NULL, task->New(NULL, 4, kMaxTaskStackSize));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), kLowestTaskPriority - 1, kMaxTaskStackSize));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), kHighestTaskPriority + 1, kMaxTaskStackSize));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, 0));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize + 1));
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(TaskTest, DeleteSelfTask) {
