@@ -20,7 +20,9 @@ class TaskTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { task->Delete(&t); }
+  virtual void TearDown() {
+    if (t != NULL) task->Delete(&t);
+  }
 };
 
 TEST_F(TaskTest, New) {
@@ -94,15 +96,6 @@ TEST_F(TaskTest, DeleteOtherTask) {
       "+ tk_del_tsk (0)\n"
       "- tk_del_tsk (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(TaskTest, DeleteMultipleTimes) {
-  task->Delete(&t);
-  systemCallLogger->Reset();
-
-  task->Delete(&t);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(TaskTest, Run) {
@@ -215,15 +208,6 @@ TEST_F(TaskTest, Delay) {
 TEST_F(TaskTest, DelayWithTimeZeroOrLess) {
   task->Delay(0);
   task->Delay(-100);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
-TEST_F(TaskTest, CallMethodWithNullInstance) {
-  task->Delete(NULL);
-  task->Run(NULL);
-  task->Suspend(NULL);
-  task->Resume(NULL);
 
   EXPECT_STREQ("", systemCallLogger->Get());
 }

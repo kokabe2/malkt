@@ -42,8 +42,8 @@ inline static bool CreateTask(Task self, int priority, int stack_size) {
 }
 
 static Task New(ActionDelegate action, int priority, int stack_size) {
-  Task self = Validate(action, priority, stack_size) ? (Task)heap->New(sizeof(TaskStruct)) : NULL;
-  if (!self) return self;
+  if (!Validate(action, priority, stack_size)) return NULL;
+  Task self = (Task)heap->New(sizeof(TaskStruct));
   self->action = action;
   if (!CreateTask(self, priority, stack_size)) heap->Delete((void**)&self);
   return self;
@@ -63,7 +63,6 @@ inline static void KillOther(Task* self) {
 }
 
 static void Delete(Task* self) {
-  if (!self || !(*self)) return;
   if (IsMyself((*self)->id))
     KillMyself(self);
   else
@@ -71,7 +70,7 @@ static void Delete(Task* self) {
 }
 
 static void Run(Task self) {
-  if (self) tk_sta_tsk(self->id, 0);  // No need to care about error.
+  tk_sta_tsk(self->id, 0);  // No need to care about error.
 }
 
 inline static bool IsSuspended(Task self) { return self->resume; }
@@ -88,7 +87,7 @@ inline static void SuspendOther(Task self) {
 }
 
 static void Suspend(Task self) {
-  if (!self || IsSuspended(self)) return;
+  if (IsSuspended(self)) return;
   if (IsMyself(self->id))
     Sleep(self);
   else
@@ -96,7 +95,7 @@ static void Suspend(Task self) {
 }
 
 static void Resume(Task self) {
-  if (!self || !IsSuspended(self)) return;
+  if (!IsSuspended(self)) return;
   ResumeDelegate resume = self->resume;
   self->resume = NULL;
   resume(self->id);
