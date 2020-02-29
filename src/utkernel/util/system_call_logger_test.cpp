@@ -9,12 +9,11 @@ extern "C" {
 class SystemCallLoggerTest : public ::testing::Test {
  protected:
   virtual void SetUp() { systemCallLogger->Reset(); }
+
   virtual void TearDown() {}
 };
 
-TEST_F(SystemCallLoggerTest, ConditionAfterNew) {
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
+TEST_F(SystemCallLoggerTest, ConditionAfterNew) { EXPECT_STREQ("", systemCallLogger->Get()); }
 
 TEST_F(SystemCallLoggerTest, LogSystemCallOnce) {
   systemCallLogger->Enter("test", 0);

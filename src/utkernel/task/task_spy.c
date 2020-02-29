@@ -26,12 +26,19 @@ static void Reset(void) {
   resume_called_count = 0;
   delay_called_count = 0;
 }
+
 static int NewCalledCount(void) { return new_called_count; }
+
 static int DeleteCalledCount(void) { return delete_called_count; }
+
 static int RunCalledCount(void) { return run_called_count; }
+
 static int SuspendCalledCount(void) { return suspend_called_count; }
+
 static int ResumeCalledCount(void) { return resume_called_count; }
+
 static int DelayCalledCount(void) { return delay_called_count; }
+
 static const TaskSpyMethodStruct kSpyMethod = {
     .Reset = Reset,
     .NewCalledCount = NewCalledCount,
@@ -41,26 +48,29 @@ static const TaskSpyMethodStruct kSpyMethod = {
     .ResumeCalledCount = ResumeCalledCount,
     .DelayCalledCount = DelayCalledCount,
 };
+
 const TaskSpyMethod taskSpy = &kSpyMethod;
 
 static Task New(ActionDelegate action, int priority, int stack_size) {
   ++new_called_count;
   return &task_dummy;
 }
+
 static void Delete(Task* self) {
   ++delete_called_count;
   if (self) *self = NULL;
 }
+
 static void Run(Task self) { ++run_called_count; }
+
 static void Suspend(Task self) { ++suspend_called_count; }
+
 static void Resume(Task self) { ++resume_called_count; }
+
 static void Delay(int time_in_milliseconds) { ++delay_called_count; }
+
 static const TaskMethodStruct kTheMethod = {
-    .New = New,
-    .Delete = Delete,
-    .Run = Run,
-    .Suspend = Suspend,
-    .Resume = Resume,
-    .Delay = Delay,
+    .New = New, .Delete = Delete, .Run = Run, .Suspend = Suspend, .Resume = Resume, .Delay = Delay,
 };
+
 const TaskMethod task = &kTheMethod;

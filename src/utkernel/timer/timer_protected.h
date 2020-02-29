@@ -14,8 +14,7 @@ typedef struct TimerStruct {
 } TimerStruct;
 
 typedef struct {
-  bool (*CreateTimer)(Timer self, int delay_in_milliseconds,
-                      int period_in_milliseconds, void (*handler)(void* exinf));
+  bool (*CreateTimer)(Timer self, int delay_in_milliseconds, int period_in_milliseconds, void (*handler)(void* exinf));
 } TimerProtectedMethodStruct;
 typedef const TimerProtectedMethodStruct* TimerProtectedMethod;
 

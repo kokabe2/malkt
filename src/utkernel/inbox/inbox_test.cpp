@@ -16,12 +16,14 @@ char kDummyMessage[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 class InboxTest : public ::testing::Test {
  protected:
   Inbox i;
+
   virtual void SetUp() {
     utkernelMbxSpy->Reset();
     utkernelMplSpy->Reset();
     i = inbox->New(1024);
     systemCallLogger->Reset();
   }
+
   virtual void TearDown() { inbox->Delete(&i); }
 };
 
@@ -96,8 +98,7 @@ TEST_F(InboxTest, DeleteMultipleTimes) {
 
 TEST_F(InboxTest, Post) {
   EXPECT_TRUE(inbox->Post(i, kDummyMessage, sizeof(kDummyMessage)));
-  EXPECT_EQ(0, memcmp(kDummyMessage, utkernelMbxSpy->LastMessage(),
-                      sizeof(kDummyMessage)));
+  EXPECT_EQ(0, memcmp(kDummyMessage, utkernelMbxSpy->LastMessage(), sizeof(kDummyMessage)));
   EXPECT_EQ(sizeof(T_MSG) + sizeof(kDummyMessage), utkernelMplSpy->BlockSize());
   EXPECT_EQ(TMO_POL, utkernelMplSpy->Timout());
   EXPECT_STREQ(
@@ -127,8 +128,7 @@ TEST_F(InboxTest, PostWithInvalidArguments) {
 
 TEST_F(InboxTest, BlockingPost) {
   EXPECT_TRUE(inbox->BlockingPost(i, kDummyMessage, sizeof(kDummyMessage)));
-  EXPECT_EQ(0, memcmp(kDummyMessage, utkernelMbxSpy->LastMessage(),
-                      sizeof(kDummyMessage)));
+  EXPECT_EQ(0, memcmp(kDummyMessage, utkernelMbxSpy->LastMessage(), sizeof(kDummyMessage)));
   EXPECT_EQ(sizeof(T_MSG) + sizeof(kDummyMessage), utkernelMplSpy->BlockSize());
   EXPECT_EQ(TMO_FEVR, utkernelMplSpy->Timout());
   EXPECT_STREQ(
@@ -183,8 +183,7 @@ TEST_F(InboxTest, BlockingGet) {
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   systemCallLogger->Reset();
 
-  EXPECT_EQ(
-      0, memcmp(kDummyMessage, inbox->BlockingGet(i), sizeof(kDummyMessage)));
+  EXPECT_EQ(0, memcmp(kDummyMessage, inbox->BlockingGet(i), sizeof(kDummyMessage)));
   EXPECT_EQ(TMO_FEVR, utkernelMbxSpy->Timeout());
   EXPECT_STREQ(
       "+ tk_rcv_mbx (0)\n"
