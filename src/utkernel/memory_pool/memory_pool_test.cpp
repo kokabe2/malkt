@@ -23,7 +23,9 @@ class MemoryPoolTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { memoryPool->Delete(&mp); }
+  virtual void TearDown() {
+    if (mp != NULL) memoryPool->Delete(&mp);
+  }
 };
 
 TEST_F(MemoryPoolTest, New) {
@@ -72,15 +74,6 @@ TEST_F(MemoryPoolTest, Delete) {
       systemCallLogger->Get());
 }
 
-TEST_F(MemoryPoolTest, DeleteMultipleTimes) {
-  memoryPool->Delete(&mp);
-  systemCallLogger->Reset();
-
-  memoryPool->Delete(&mp);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(MemoryPoolTest, Get) {
   EXPECT_TRUE(memoryPool->Get(mp) != NULL);
   EXPECT_EQ(TMO_POL, utkernelMpfSpy->Timout());
@@ -114,17 +107,6 @@ TEST_F(MemoryPoolTest, Release) {
 
 TEST_F(MemoryPoolTest, ReleaseWithInvalidArgument) {
   memoryPool->Release(mp, NULL);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
-TEST_F(MemoryPoolTest, CallMethodWithNullInstance) {
-  void *block = memoryPool->Get(mp);
-  systemCallLogger->Reset();
-
-  memoryPool->Delete(NULL);
-  EXPECT_EQ(NULL, memoryPool->Get(NULL));
-  memoryPool->Release(NULL, block);
 
   EXPECT_STREQ("", systemCallLogger->Get());
 }

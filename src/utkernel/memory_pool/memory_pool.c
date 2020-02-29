@@ -32,18 +32,17 @@ static MemoryPool New(void* memory_area, int capacity, int block_size) {
 }
 
 static void Delete(MemoryPool* self) {
-  if (!self || !*self) return;
   tk_del_mpf((*self)->id);
   heap->Delete((void**)self);
 }
 
 static void* Get(MemoryPool self) {
   void* block;
-  return self && tk_get_mpf(self->id, &block, TMO_POL) == E_OK ? block : NULL;
+  return tk_get_mpf(self->id, &block, TMO_POL) == E_OK ? block : NULL;
 }
 
 static void Release(MemoryPool self, void* block) {
-  if (self && block) tk_rel_mpf(self->id, block);
+  if (block) tk_rel_mpf(self->id, block);
 }
 
 static const MemoryPoolMethodStruct kTheMethod = {
