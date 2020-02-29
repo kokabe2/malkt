@@ -18,22 +18,22 @@ typedef struct InboxStruct {
 
 static const int kHeaderSize = sizeof(T_MSG);
 
+inline static void CreateMailbox(Inbox self) {
+  T_CMBX mbx_packet = {.mbxatr = (TA_TFIFO | TA_MFIFO)};
+  self->mbx_id = tk_cre_mbx(&mbx_packet);
+}
+
 inline static int LimitCapacity(int capacity) { return capacity > kMaxInboxCapacity ? kMaxInboxCapacity : capacity; }
 
-inline static bool CreateInbox(Inbox self, int capacity) {
-  T_CMBX mbx_packet = {.mbxatr = (TA_TFIFO | TA_MFIFO)};
-  if ((self->mbx_id = tk_cre_mbx(&mbx_packet)) < 0) return false;
-
+inline static void CreateMemoryPool(Inbox self, int capacity) {
   T_CMPL mpl_packet = {.mplatr = (TA_TFIFO | TA_RNG0), .mplsz = LimitCapacity(capacity)};
-  if ((self->mpl_id = tk_cre_mpl(&mpl_packet)) >= 0) return true;
-
-  tk_del_mbx(self->mbx_id);
-  return false;
+  self->mpl_id = tk_cre_mpl(&mpl_packet);
 }
 
 static Inbox New(int capacity) {
   Inbox self = (Inbox)heap->New(sizeof(InboxStruct));
-  if (!CreateInbox(self, capacity)) heap->Delete((void**)&self);
+  CreateMailbox(self);
+  CreateMemoryPool(self, capacity);
   return self;
 }
 

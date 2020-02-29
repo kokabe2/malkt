@@ -46,30 +46,6 @@ TEST_F(InboxTest, New) {
   inbox->Delete(&instance);
 }
 
-TEST_F(InboxTest, NewWhenMailboxCreationFailed) {
-  utkernelMbxSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, inbox->New(128));
-  EXPECT_STREQ(
-      "+ tk_cre_mbx\n"
-      "- tk_cre_mbx (-34)\n",
-      systemCallLogger->Get());
-}
-
-TEST_F(InboxTest, NewWhenMemoryPoolCreationFailed) {
-  utkernelMplSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, inbox->New(128));
-  EXPECT_STREQ(
-      "+ tk_cre_mbx\n"
-      "- tk_cre_mbx (0)\n"
-      "+ tk_cre_mpl\n"
-      "- tk_cre_mpl (-34)\n"
-      "+ tk_del_mbx (0)\n"
-      "- tk_del_mbx (0)\n",
-      systemCallLogger->Get());
-}
-
 TEST_F(InboxTest, NewWithOutRangeOfCapacity) {
   Inbox instance = inbox->New(kMaxInboxCapacity + 1);
 
