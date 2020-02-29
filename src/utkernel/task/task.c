@@ -61,7 +61,7 @@ static Task New(ActionDelegate action, int priority, int stack_size) {
   return self;
 }
 
-inline static bool IsMyself(int id) { return id == tk_get_tid(); }
+inline static bool IsMyself(Task self) { return self->id == tk_get_tid(); }
 
 inline static void KillMyself(Task* self) {
   heap->Delete((void**)self);
@@ -69,23 +69,21 @@ inline static void KillMyself(Task* self) {
 }
 
 inline static void KillOther(Task* self) {
-  tk_ter_tsk((*self)->id);  // No need to care about error.
+  tk_ter_tsk((*self)->id);
   tk_del_tsk((*self)->id);
   heap->Delete((void**)self);
 }
 
 static void Delete(Task* self) {
-  if (IsMyself((*self)->id))
+  if (IsMyself(*self))
     KillMyself(self);
   else
     KillOther(self);
 }
 
-static void Run(Task self) {
-  tk_sta_tsk(self->id, 0);  // No need to care about error.
-}
+static void Run(Task self) { tk_sta_tsk(self->id, 0); }
 
-inline static bool IsSuspended(Task self) { return self->resume; }
+inline static bool IsSuspended(Task self) { return self->resume != NULL; }
 
 inline static void Sleep(Task self) {
   self->resume = tk_wup_tsk;
@@ -100,17 +98,19 @@ inline static void SuspendOther(Task self) {
 
 static void Suspend(Task self) {
   if (IsSuspended(self)) return;
-  if (IsMyself(self->id))
+
+  if (IsMyself(self))
     Sleep(self);
   else
     SuspendOther(self);
 }
 
 static void Resume(Task self) {
-  if (!IsSuspended(self)) return;
-  ResumeDelegate resume = self->resume;
-  self->resume = NULL;
-  resume(self->id);
+  if (IsSuspended(self)) {
+    ResumeDelegate resume = self->resume;
+    self->resume = NULL;
+    resume(self->id);
+  }
 }
 
 static void Delay(int time_in_milliseconds) { tk_dly_tsk(time_in_milliseconds); }
