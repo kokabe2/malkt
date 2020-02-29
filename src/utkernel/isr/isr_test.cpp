@@ -41,16 +41,6 @@ TEST_F(IsrTest, New) {
   isr->Delete(&instance);
 }
 
-TEST_F(IsrTest, NewWhenInterruptDefinitionFailed) {
-  utkernelIntSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, isr->New(24, InterruptDummy));
-  EXPECT_STREQ(
-      "+ tk_def_int (24)\n"
-      "- tk_def_int (-34)\n",
-      systemCallLogger->Get());
-}
-
 TEST_F(IsrTest, Delete) {
   isr->Delete(&i);
 

@@ -12,15 +12,15 @@ typedef struct IsrStruct {
   int interrupt_number;  //
 } IsrStruct;
 
-inline static bool Register(Isr self, InterruptDelegate interrupt) {
+inline static void Register(Isr self, InterruptDelegate interrupt) {
   T_DINT packet = {.intatr = TA_HLNG, .inthdr = (FP)interrupt};
-  return tk_def_int((UINT)self->interrupt_number, &packet) == E_OK;
+  tk_def_int((UINT)self->interrupt_number, &packet);
 }
 
 static Isr New(int interrupt_number, InterruptDelegate interrupt) {
   Isr self = (Isr)heap->New(sizeof(IsrStruct));
   self->interrupt_number = interrupt_number;
-  if (!Register(self, interrupt)) heap->Delete((void**)&self);
+  Register(self, interrupt);
   return self;
 }
 
