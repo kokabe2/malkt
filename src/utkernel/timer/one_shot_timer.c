@@ -34,7 +34,7 @@ static Timer New(TimerDelegate timer, int delay_in_milliseconds) {
   OneShotTimer self = (OneShotTimer)heap->New(sizeof(OneShotTimerStruct));
   self->base.timer = timer;
   self->base.impl = &kConcreteMethod;
-  if (!_timer->CreateTimer((Timer)self, delay_in_milliseconds, ~0, TimerEntry)) heap->Delete((void**)&self);
+  _timer->CreateTimer((Timer)self, delay_in_milliseconds, ~0, TimerEntry);
   return (Timer)self;
 }
 

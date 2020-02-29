@@ -44,16 +44,6 @@ TEST_F(OneShotTimerTest, New) {
   timer->Delete(&instance);
 }
 
-TEST_F(OneShotTimerTest, NewWhenTimerCreationFailed) {
-  utkernelCycSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), 10));
-  EXPECT_STREQ(
-      "+ tk_cre_cyc\n"
-      "- tk_cre_cyc (-34)\n",
-      systemCallLogger->Get());
-}
-
 TEST_F(OneShotTimerTest, ResumeWhenTimerIsNotDone) {
   timer->Resume(t);
 

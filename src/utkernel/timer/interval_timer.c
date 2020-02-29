@@ -21,8 +21,7 @@ static Timer New(TimerDelegate timer, int period_in_milliseconds) {
   Timer self = (Timer)heap->New(sizeof(TimerStruct));
   self->timer = timer;
   self->impl = &kConcreteMethod;
-  if (!_timer->CreateTimer(self, period_in_milliseconds, period_in_milliseconds, TimerEntry))
-    heap->Delete((void**)&self);
+  _timer->CreateTimer(self, period_in_milliseconds, period_in_milliseconds, TimerEntry);
   return self;
 }
 

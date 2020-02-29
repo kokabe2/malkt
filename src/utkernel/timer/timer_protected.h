@@ -3,8 +3,6 @@
 #ifndef SRC_UTKERNEL_TIMER_TIMER_PROTECTED_H_
 #define SRC_UTKERNEL_TIMER_TIMER_PROTECTED_H_
 
-#include <stdbool.h>
-
 #include "timer.h"
 
 typedef struct TimerStruct {
@@ -14,7 +12,7 @@ typedef struct TimerStruct {
 } TimerStruct;
 
 typedef struct {
-  bool (*CreateTimer)(Timer self, int delay_in_milliseconds, int period_in_milliseconds, void (*handler)(void* exinf));
+  void (*CreateTimer)(Timer self, int delay_in_milliseconds, int period_in_milliseconds, void (*handler)(void* exinf));
 } TimerProtectedMethodStruct;
 typedef const TimerProtectedMethodStruct* TimerProtectedMethod;
 
