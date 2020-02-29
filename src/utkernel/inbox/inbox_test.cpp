@@ -24,7 +24,9 @@ class InboxTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { inbox->Delete(&i); }
+  virtual void TearDown() {
+    if (i != NULL) inbox->Delete(&i);
+  }
 };
 
 TEST_F(InboxTest, New) {
@@ -44,35 +46,12 @@ TEST_F(InboxTest, New) {
   inbox->Delete(&instance);
 }
 
-TEST_F(InboxTest, NewWhenMailboxCreationFailed) {
-  utkernelMbxSpy->SetReturnCode(0, -34);
+TEST_F(InboxTest, NewWithOutRangeOfCapacity) {
+  Inbox instance = inbox->New(kMaxInboxCapacity + 1);
 
-  EXPECT_EQ(NULL, inbox->New(128));
-  EXPECT_STREQ(
-      "+ tk_cre_mbx\n"
-      "- tk_cre_mbx (-34)\n",
-      systemCallLogger->Get());
-}
+  EXPECT_EQ(kMaxInboxCapacity, utkernelMplSpy->Capacity());
 
-TEST_F(InboxTest, NewWhenMemoryPoolCreationFailed) {
-  utkernelMplSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, inbox->New(128));
-  EXPECT_STREQ(
-      "+ tk_cre_mbx\n"
-      "- tk_cre_mbx (0)\n"
-      "+ tk_cre_mpl\n"
-      "- tk_cre_mpl (-34)\n"
-      "+ tk_del_mbx (0)\n"
-      "- tk_del_mbx (0)\n",
-      systemCallLogger->Get());
-}
-
-TEST_F(InboxTest, NewWithInvalidArguments) {
-  EXPECT_EQ(NULL, inbox->New(0));
-  EXPECT_EQ(NULL, inbox->New(-128));
-  EXPECT_EQ(NULL, inbox->New(kMaxInboxCapacity + 1));
-  EXPECT_STREQ("", systemCallLogger->Get());
+  inbox->Delete(&instance);
 }
 
 TEST_F(InboxTest, Delete) {
@@ -85,15 +64,6 @@ TEST_F(InboxTest, Delete) {
       "+ tk_del_mpl (0)\n"
       "- tk_del_mpl (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(InboxTest, DeleteMultipleTimes) {
-  inbox->Delete(&i);
-  systemCallLogger->Reset();
-
-  inbox->Delete(&i);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(InboxTest, Post) {
@@ -117,13 +87,6 @@ TEST_F(InboxTest, PostWhenMemoryBlockAcquisitionFailed) {
       "+ tk_get_mpl (0)\n"
       "- tk_get_mpl (-50)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(InboxTest, PostWithInvalidArguments) {
-  EXPECT_FALSE(inbox->Post(i, kDummyMessage, 0));
-  EXPECT_FALSE(inbox->Post(i, kDummyMessage, -16));
-  EXPECT_FALSE(inbox->Post(i, NULL, 16));
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(InboxTest, BlockingPost) {
@@ -189,14 +152,4 @@ TEST_F(InboxTest, BlockingGet) {
       "+ tk_rcv_mbx (0)\n"
       "- tk_rcv_mbx (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(InboxTest, CallMethodWithNullInstance) {
-  inbox->Delete(NULL);
-  EXPECT_FALSE(inbox->Post(NULL, kDummyMessage, 1));
-  EXPECT_FALSE(inbox->BlockingPost(NULL, kDummyMessage, 1));
-  EXPECT_EQ(NULL, inbox->Get(NULL));
-  EXPECT_EQ(NULL, inbox->BlockingGet(NULL));
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
