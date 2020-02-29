@@ -56,8 +56,7 @@ TEST_F(MemoryPoolTest, NewWithInvalidArgument) {
   EXPECT_EQ(NULL, memoryPool->New(memory_area, -128, 32));
   EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), 0));
   EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), -8));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area),
-                                  sizeof(memory_area) + 1));
+  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), sizeof(memory_area) + 1));
   EXPECT_STREQ("", systemCallLogger->Get());
 }
 

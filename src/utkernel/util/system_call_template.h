@@ -7,8 +7,7 @@ typedef void (*ExecuteDelegate)(const void* info);
 typedef struct {
   void (*SetId)(int id);
   void (*SetReturnCode)(int return_code);
-  int (*Execute)(const char* system_call_name, ExecuteDelegate execute,
-                 const void* info);
+  int (*Execute)(const char* system_call_name, ExecuteDelegate execute, const void* info);
 } SystemCallTemplateMethodStruct;
 typedef const SystemCallTemplateMethodStruct* SystemCallTemplateMethod;
 

@@ -13,11 +13,9 @@ typedef struct MemoryPoolStruct {
 } MemoryPoolStruct;
 
 inline static bool Validate(void* memory_area, int capacity, int block_size) {
-  return memory_area && capacity > 0 && block_size > 0 &&
-         block_size <= capacity;
+  return memory_area && capacity > 0 && block_size > 0 && block_size <= capacity;
 }
-inline static bool CreateMemoryPool(MemoryPool self, void* memory_area,
-                                    int capacity, int block_size) {
+inline static bool CreateMemoryPool(MemoryPool self, void* memory_area, int capacity, int block_size) {
   T_CMPF packet = {.mpfatr = (TA_TFIFO | TA_RNG0 | TA_USERBUF),
                    .mpfcnt = capacity / block_size,
                    .blfsz = block_size,
@@ -25,11 +23,9 @@ inline static bool CreateMemoryPool(MemoryPool self, void* memory_area,
   return (self->id = tk_cre_mpf(&packet)) >= 0;
 }
 static MemoryPool New(void* memory_area, int capacity, int block_size) {
-  MemoryPool self = Validate(memory_area, capacity, block_size)
-                        ? (MemoryPool)heap->New(sizeof(MemoryPoolStruct))
-                        : NULL;
-  if (self && !CreateMemoryPool(self, memory_area, capacity, block_size))
-    heap->Delete((void**)&self);
+  MemoryPool self =
+      Validate(memory_area, capacity, block_size) ? (MemoryPool)heap->New(sizeof(MemoryPoolStruct)) : NULL;
+  if (self && !CreateMemoryPool(self, memory_area, capacity, block_size)) heap->Delete((void**)&self);
   return self;
 }
 static void Delete(MemoryPool* self) {

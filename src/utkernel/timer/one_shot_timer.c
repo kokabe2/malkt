@@ -31,19 +31,15 @@ static void TimerEntry(void* exinf) {
   self->is_done = true;
 }
 static Timer New(TimerDelegate timer, int delay_in_milliseconds) {
-  OneShotTimer self = Validate(timer, delay_in_milliseconds)
-                          ? (OneShotTimer)heap->New(sizeof(OneShotTimerStruct))
-                          : NULL;
+  OneShotTimer self =
+      Validate(timer, delay_in_milliseconds) ? (OneShotTimer)heap->New(sizeof(OneShotTimerStruct)) : NULL;
   if (!self) return (Timer)self;
   self->base.timer = timer;
   self->base.impl = &kConcreteMethod;
-  if (!_timer->CreateTimer((Timer)self, delay_in_milliseconds, ~0, TimerEntry))
-    heap->Delete((void**)&self);
+  if (!_timer->CreateTimer((Timer)self, delay_in_milliseconds, ~0, TimerEntry)) heap->Delete((void**)&self);
   return (Timer)self;
 }
-static bool IsDone(Timer self) {
-  return self ? Downcast(self)->is_done : false;
-}
+static bool IsDone(Timer self) { return self ? Downcast(self)->is_done : false; }
 static const OneShotTimerMethodStruct kTheMethod = {
     .New = New, .IsDone = IsDone,
 };

@@ -23,9 +23,7 @@ static void Reset(void) {
 static ATR Attribute(void) { return its_attribute; }
 static FP InterruptHandler(void) { return its_interrupt_handler; }
 static INT Level(void) { return its_level; }
-static void SetReturnCode(int number, INT code) {
-  return_codes[number_of_executions + number] = code;
-}
+static void SetReturnCode(int number, INT code) { return_codes[number_of_executions + number] = code; }
 static const UtkernelIntSpyMethodStruct kTheMethod = {
     .Reset = Reset,
     .Attribute = Attribute,

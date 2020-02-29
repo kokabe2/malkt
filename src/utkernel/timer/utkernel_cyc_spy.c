@@ -27,9 +27,7 @@ static ATR Attribute(void) { return its_attribute; }
 static RELTIM CycleTime(void) { return its_cycle_time; }
 static RELTIM CyclePhase(void) { return its_cycle_phase; }
 static void RunTimer(void) { its_timer(its_exinf); }
-static void SetReturnCode(int number, INT code) {
-  return_codes[number_of_executions + number] = code;
-}
+static void SetReturnCode(int number, INT code) { return_codes[number_of_executions + number] = code; }
 static const UtkernelCycSpyMethodStruct kTheMethod = {
     .Reset = Reset,
     .Attribute = Attribute,

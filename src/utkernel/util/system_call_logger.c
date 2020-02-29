@@ -16,13 +16,11 @@ static void Reset(void) {
 }
 inline static int free_space(void) { return sizeof(log) - log_offset; }
 inline static void AddCount(const char* plus_or_minus) {
-  for (int i = 0; i < nest_level; ++i)
-    log_offset += snprintf(&log[log_offset], free_space(), "%s", plus_or_minus);
+  for (int i = 0; i < nest_level; ++i) log_offset += snprintf(&log[log_offset], free_space(), "%s", plus_or_minus);
 }
 inline static void AddLog(const char* system_call_name, int i) {
   const char* format = i != kNonsenseParameter ? " %s (%d)\n" : " %s\n";
-  log_offset +=
-      snprintf(&log[log_offset], free_space(), format, system_call_name, i);
+  log_offset += snprintf(&log[log_offset], free_space(), format, system_call_name, i);
 }
 static void Enter(const char* system_call_name, int id) {
   ++nest_level;

@@ -19,10 +19,8 @@ typedef struct TaskStruct {
   ResumeDelegate resume;
 } TaskStruct;
 
-inline static bool Validate(ActionDelegate action, int priority,
-                            int stack_size) {
-  return action && priority >= kLowestTaskPriority &&
-         priority <= kHighestTaskPriority && stack_size > 0 &&
+inline static bool Validate(ActionDelegate action, int priority, int stack_size) {
+  return action && priority >= kLowestTaskPriority && priority <= kHighestTaskPriority && stack_size > 0 &&
          stack_size <= kMaxTaskStackSize;
 }
 static void TaskEntry(int unused, void* exinf) {
@@ -30,9 +28,7 @@ static void TaskEntry(int unused, void* exinf) {
   self->action();
   tk_ext_tsk();
 }
-inline static int Reverse(int priority) {
-  return kHighestTaskPriority - priority + kPriorityOffset;
-}
+inline static int Reverse(int priority) { return kHighestTaskPriority - priority + kPriorityOffset; }
 inline static bool CreateTask(Task self, int priority, int stack_size) {
   T_CTSK packet = {.exinf = (void*)self,
                    .tskatr = (TA_HLNG | TA_RNG0),
@@ -42,9 +38,7 @@ inline static bool CreateTask(Task self, int priority, int stack_size) {
   return (self->id = tk_cre_tsk(&packet)) >= 0;
 }
 static Task New(ActionDelegate action, int priority, int stack_size) {
-  Task self = Validate(action, priority, stack_size)
-                  ? (Task)heap->New(sizeof(TaskStruct))
-                  : NULL;
+  Task self = Validate(action, priority, stack_size) ? (Task)heap->New(sizeof(TaskStruct)) : NULL;
   if (!self) return self;
   self->action = action;
   if (!CreateTask(self, priority, stack_size)) heap->Delete((void**)&self);
@@ -97,11 +91,6 @@ static void Delay(int time_in_milliseconds) {
   if (time_in_milliseconds > 0) tk_dly_tsk(time_in_milliseconds);
 }
 static const TaskMethodStruct kTheMethod = {
-    .New = New,
-    .Delete = Delete,
-    .Run = Run,
-    .Suspend = Suspend,
-    .Resume = Resume,
-    .Delay = Delay,
+    .New = New, .Delete = Delete, .Run = Run, .Suspend = Suspend, .Resume = Resume, .Delay = Delay,
 };
 const TaskMethod task = &kTheMethod;

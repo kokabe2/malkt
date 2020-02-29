@@ -20,9 +20,7 @@ inline static bool Register(Isr self, InterruptDelegate interrupt) {
   return tk_def_int((UINT)self->interrupt_number, &packet) == E_OK;
 }
 static Isr New(int interrupt_number, InterruptDelegate interrupt) {
-  Isr self = Validate(interrupt_number, interrupt)
-                 ? (Isr)heap->New(sizeof(IsrStruct))
-                 : NULL;
+  Isr self = Validate(interrupt_number, interrupt) ? (Isr)heap->New(sizeof(IsrStruct)) : NULL;
   if (!self) return self;
   self->interrupt_number = interrupt_number;
   if (!Register(self, interrupt)) heap->Delete((void**)&self);

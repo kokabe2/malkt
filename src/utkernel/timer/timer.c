@@ -6,8 +6,7 @@
 #include "timer_protected.h"
 #include "utkernel/utkernel.h"
 
-static bool CreateTimer(Timer self, int delay_in_milliseconds,
-                        int period_in_milliseconds,
+static bool CreateTimer(Timer self, int delay_in_milliseconds, int period_in_milliseconds,
                         void (*handler)(void* exinf)) {
   T_CCYC packet = {.exinf = self,
                    .cycatr = TA_HLNG | TA_STA | TA_PHS,

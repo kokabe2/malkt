@@ -38,13 +38,11 @@ TEST_F(TaskTest, New) {
 }
 
 TEST_F(TaskTest, NewWithBoundaryPriority) {
-  Task highest_priority = task->New(functionEntrySpy->Get(),
-                                    kHighestTaskPriority, kMaxTaskStackSize);
+  Task highest_priority = task->New(functionEntrySpy->Get(), kHighestTaskPriority, kMaxTaskStackSize);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
   task->Delete(&highest_priority);
 
-  Task lowest_priority = task->New(functionEntrySpy->Get(), kLowestTaskPriority,
-                                   kMaxTaskStackSize);
+  Task lowest_priority = task->New(functionEntrySpy->Get(), kLowestTaskPriority, kMaxTaskStackSize);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
   task->Delete(&lowest_priority);
 }
@@ -61,10 +59,8 @@ TEST_F(TaskTest, NewWhenTaskCreationFailed) {
 
 TEST_F(TaskTest, NewWithInvalidArguments) {
   EXPECT_EQ(NULL, task->New(NULL, 4, kMaxTaskStackSize));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), kLowestTaskPriority - 1,
-                            kMaxTaskStackSize));
-  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), kHighestTaskPriority + 1,
-                            kMaxTaskStackSize));
+  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), kLowestTaskPriority - 1, kMaxTaskStackSize));
+  EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), kHighestTaskPriority + 1, kMaxTaskStackSize));
   EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, 0));
   EXPECT_EQ(NULL, task->New(functionEntrySpy->Get(), 4, kMaxTaskStackSize + 1));
   EXPECT_STREQ("", systemCallLogger->Get());

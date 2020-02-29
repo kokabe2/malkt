@@ -89,6 +89,4 @@ TEST_F(OneShotTimerTest, RunTimerOnlyOnce) {
   EXPECT_FALSE(timerHandlerSpy->WasRun());
 }
 
-TEST_F(OneShotTimerTest, CallMethodWithNullInstance) {
-  EXPECT_FALSE(oneShotTimer->IsDone(NULL));
-}
+TEST_F(OneShotTimerTest, CallMethodWithNullInstance) { EXPECT_FALSE(oneShotTimer->IsDone(NULL)); }

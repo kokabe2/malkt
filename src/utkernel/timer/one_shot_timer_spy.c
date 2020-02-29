@@ -24,9 +24,7 @@ static const OneShotTimerSpyMethodStruct kSpyMethod = {
 };
 const OneShotTimerSpyMethod oneShotTimerSpy = &kSpyMethod;
 
-static Timer New(TimerDelegate timer, int delay_in_milliseconds) {
-  return (Timer)&the_instances[new_called_count++];
-}
+static Timer New(TimerDelegate timer, int delay_in_milliseconds) { return (Timer)&the_instances[new_called_count++]; }
 static bool IsDone(Timer self) { return ((OneShotTimer)self)->is_done; }
 static const OneShotTimerMethodStruct kTheMethod = {
     .New = New, .IsDone = IsDone,

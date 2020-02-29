@@ -21,14 +21,11 @@ static void TimerEntry(void* exinf) {
   self->timer();
 }
 static Timer New(TimerDelegate timer, int period_in_milliseconds) {
-  Timer self = Validate(timer, period_in_milliseconds)
-                   ? (Timer)heap->New(sizeof(TimerStruct))
-                   : NULL;
+  Timer self = Validate(timer, period_in_milliseconds) ? (Timer)heap->New(sizeof(TimerStruct)) : NULL;
   if (!self) return self;
   self->timer = timer;
   self->impl = &kConcreteMethod;
-  if (!_timer->CreateTimer(self, period_in_milliseconds, period_in_milliseconds,
-                           TimerEntry))
+  if (!_timer->CreateTimer(self, period_in_milliseconds, period_in_milliseconds, TimerEntry))
     heap->Delete((void**)&self);
   return self;
 }

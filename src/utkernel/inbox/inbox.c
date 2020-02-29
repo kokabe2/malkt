@@ -18,9 +18,7 @@ typedef struct InboxStruct {
 
 static const int kHeaderSize = sizeof(T_MSG);
 
-inline static bool IsValid(int capacity) {
-  return capacity > 0 && capacity <= kMaxInboxCapacity;
-}
+inline static bool IsValid(int capacity) { return capacity > 0 && capacity <= kMaxInboxCapacity; }
 inline static bool CreateInbox(Inbox self, int capacity) {
   T_CMBX mbx_packet = {.mbxatr = (TA_TFIFO | TA_MFIFO)};
   if ((self->mbx_id = tk_cre_mbx(&mbx_packet)) < 0) return false;
@@ -42,14 +40,9 @@ static void Delete(Inbox* self) {
   tk_del_mpl((*self)->mpl_id);
   heap->Delete((void**)self);
 }
-inline static bool Validate(const void* message, int size) {
-  return message && size > 0;
-}
-inline static void SendMail(Inbox self, void* mail) {
-  tk_snd_mbx(self->mbx_id, (T_MSG*)mail);
-}
-inline static bool PostTemplate(Inbox self, const void* message, int size,
-                                ComposeDelegate compose) {
+inline static bool Validate(const void* message, int size) { return message && size > 0; }
+inline static void SendMail(Inbox self, void* mail) { tk_snd_mbx(self->mbx_id, (T_MSG*)mail); }
+inline static bool PostTemplate(Inbox self, const void* message, int size, ComposeDelegate compose) {
   if (!self || !Validate(message, size)) return false;
   void* mail = compose(self, message, size);
   if (mail) SendMail(self, mail);
@@ -57,24 +50,16 @@ inline static bool PostTemplate(Inbox self, const void* message, int size,
 }
 inline static void* GetMemoryBlock(Inbox self, int size, TMO timeout) {
   void* mail;
-  return tk_get_mpl(self->mpl_id, kHeaderSize + size, &mail, timeout) == E_OK
-             ? mail
-             : NULL;
+  return tk_get_mpl(self->mpl_id, kHeaderSize + size, &mail, timeout) == E_OK ? mail : NULL;
 }
-inline static void* ExtractMessage(void* mail) {
-  return (void*)((uintptr_t)mail + kHeaderSize);
-}
-inline static void EditMail(void* mail, const void* message, int size) {
-  memcpy(ExtractMessage(mail), message, size);
-}
+inline static void* ExtractMessage(void* mail) { return (void*)((uintptr_t)mail + kHeaderSize); }
+inline static void EditMail(void* mail, const void* message, int size) { memcpy(ExtractMessage(mail), message, size); }
 static void* ComposeMail(Inbox self, const void* message, int size) {
   void* mail = GetMemoryBlock(self, size, TMO_POL);
   if (mail) EditMail(mail, message, size);
   return mail;
 }
-static bool Post(Inbox self, const void* message, int size) {
-  return PostTemplate(self, message, size, ComposeMail);
-}
+static bool Post(Inbox self, const void* message, int size) { return PostTemplate(self, message, size, ComposeMail); }
 static void* BlockingComposeMail(Inbox self, const void* message, int size) {
   void* mail = GetMemoryBlock(self, size, TMO_FEVR);
   if (mail) EditMail(mail, message, size);
@@ -94,25 +79,16 @@ inline static void* GetTemplate(Inbox self, GetDelegate get) {
   return get(self) ? ExtractMessage(self->last_mail) : NULL;
 }
 static bool GetNextMail(Inbox self) {
-  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_POL) != E_OK)
-    self->last_mail = NULL;  // Just in case.
+  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_POL) != E_OK) self->last_mail = NULL;  // Just in case.
   return self->last_mail;
 }
 static void* Get(Inbox self) { return GetTemplate(self, GetNextMail); }
 static bool BlockingGetNextMail(Inbox self) {
-  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_FEVR) != E_OK)
-    self->last_mail = NULL;  // Just in case.
+  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_FEVR) != E_OK) self->last_mail = NULL;  // Just in case.
   return self->last_mail;
 }
-static void* BlockingGet(Inbox self) {
-  return GetTemplate(self, BlockingGetNextMail);
-}
+static void* BlockingGet(Inbox self) { return GetTemplate(self, BlockingGetNextMail); }
 static const InboxMethodStruct kTheMethod = {
-    .New = New,
-    .Delete = Delete,
-    .Post = Post,
-    .BlockingPost = BlockingPost,
-    .Get = Get,
-    .BlockingGet = BlockingGet,
+    .New = New, .Delete = Delete, .Post = Post, .BlockingPost = BlockingPost, .Get = Get, .BlockingGet = BlockingGet,
 };
 const InboxMethod inbox = &kTheMethod;
