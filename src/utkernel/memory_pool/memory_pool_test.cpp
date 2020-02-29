@@ -23,7 +23,9 @@ class MemoryPoolTest : public ::testing::Test {
     systemCallLogger->Reset();
   }
 
-  virtual void TearDown() { memoryPool->Delete(&mp); }
+  virtual void TearDown() {
+    if (mp != NULL) memoryPool->Delete(&mp);
+  }
 };
 
 TEST_F(MemoryPoolTest, New) {
@@ -42,26 +44,6 @@ TEST_F(MemoryPoolTest, New) {
   memoryPool->Delete(&instance);
 }
 
-TEST_F(MemoryPoolTest, NewWhenMemoryPoolCreationFailed) {
-  utkernelMpfSpy->SetReturnCode(0, -34);
-
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), 32));
-  EXPECT_STREQ(
-      "+ tk_cre_mpf\n"
-      "- tk_cre_mpf (-34)\n",
-      systemCallLogger->Get());
-}
-
-TEST_F(MemoryPoolTest, NewWithInvalidArgument) {
-  EXPECT_EQ(NULL, memoryPool->New(NULL, sizeof(memory_area), 32));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, 0, 32));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, -128, 32));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), 0));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), -8));
-  EXPECT_EQ(NULL, memoryPool->New(memory_area, sizeof(memory_area), sizeof(memory_area) + 1));
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(MemoryPoolTest, Delete) {
   memoryPool->Delete(&mp);
 
@@ -70,15 +52,6 @@ TEST_F(MemoryPoolTest, Delete) {
       "+ tk_del_mpf (0)\n"
       "- tk_del_mpf (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(MemoryPoolTest, DeleteMultipleTimes) {
-  memoryPool->Delete(&mp);
-  systemCallLogger->Reset();
-
-  memoryPool->Delete(&mp);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(MemoryPoolTest, Get) {
@@ -110,21 +83,4 @@ TEST_F(MemoryPoolTest, Release) {
       "+ tk_rel_mpf (0)\n"
       "- tk_rel_mpf (0)\n",
       systemCallLogger->Get());
-}
-
-TEST_F(MemoryPoolTest, ReleaseWithInvalidArgument) {
-  memoryPool->Release(mp, NULL);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
-TEST_F(MemoryPoolTest, CallMethodWithNullInstance) {
-  void *block = memoryPool->Get(mp);
-  systemCallLogger->Reset();
-
-  memoryPool->Delete(NULL);
-  EXPECT_EQ(NULL, memoryPool->Get(NULL));
-  memoryPool->Release(NULL, block);
-
-  EXPECT_STREQ("", systemCallLogger->Get());
 }
