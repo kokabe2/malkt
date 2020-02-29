@@ -2,8 +2,6 @@
 // This software is released under the MIT License, see LICENSE.
 #include "interval_timer.h"
 
-#include <stddef.h>
-
 #include "bleu/v1/heap.h"
 #include "timer_protected.h"
 #include "utkernel/utkernel.h"
@@ -14,18 +12,13 @@ static const TimerAbstractMethodStruct kConcreteMethod = {
     .Resume = Resume,
 };
 
-inline static bool Validate(TimerDelegate timer, int period_in_milliseconds) {
-  return timer && period_in_milliseconds > 0;
-}
-
 static void TimerEntry(void* exinf) {
   Timer self = (Timer)exinf;
   self->timer();
 }
 
 static Timer New(TimerDelegate timer, int period_in_milliseconds) {
-  Timer self = Validate(timer, period_in_milliseconds) ? (Timer)heap->New(sizeof(TimerStruct)) : NULL;
-  if (!self) return self;
+  Timer self = (Timer)heap->New(sizeof(TimerStruct));
   self->timer = timer;
   self->impl = &kConcreteMethod;
   if (!_timer->CreateTimer(self, period_in_milliseconds, period_in_milliseconds, TimerEntry))

@@ -54,13 +54,6 @@ TEST_F(OneShotTimerTest, NewWhenTimerCreationFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(OneShotTimerTest, NewWithInvalidArgument) {
-  EXPECT_EQ(NULL, oneShotTimer->New(NULL, 10));
-  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), 0));
-  EXPECT_EQ(NULL, oneShotTimer->New(timerHandlerSpy->Get(), -128));
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(OneShotTimerTest, ResumeWhenTimerIsNotDone) {
   timer->Resume(t);
 

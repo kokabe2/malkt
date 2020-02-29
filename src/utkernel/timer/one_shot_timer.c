@@ -23,10 +23,6 @@ static const TimerAbstractMethodStruct kConcreteMethod = {
     .Resume = Resume,
 };
 
-inline static bool Validate(TimerDelegate timer, int delay_in_milliseconds) {
-  return timer && delay_in_milliseconds > 0;
-}
-
 static void TimerEntry(void* exinf) {
   OneShotTimer self = (OneShotTimer)exinf;
   if (self->is_done) return;
@@ -35,9 +31,7 @@ static void TimerEntry(void* exinf) {
 }
 
 static Timer New(TimerDelegate timer, int delay_in_milliseconds) {
-  OneShotTimer self =
-      Validate(timer, delay_in_milliseconds) ? (OneShotTimer)heap->New(sizeof(OneShotTimerStruct)) : NULL;
-  if (!self) return (Timer)self;
+  OneShotTimer self = (OneShotTimer)heap->New(sizeof(OneShotTimerStruct));
   self->base.timer = timer;
   self->base.impl = &kConcreteMethod;
   if (!_timer->CreateTimer((Timer)self, delay_in_milliseconds, ~0, TimerEntry)) heap->Delete((void**)&self);

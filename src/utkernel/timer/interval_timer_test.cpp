@@ -54,13 +54,6 @@ TEST_F(IntervalTimerTest, NewWhenTimerCreationFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(IntervalTimerTest, NewWithInvalidArgument) {
-  EXPECT_EQ(NULL, intervalTimer->New(NULL, 10));
-  EXPECT_EQ(NULL, intervalTimer->New(timerHandlerSpy->Get(), 0));
-  EXPECT_EQ(NULL, intervalTimer->New(timerHandlerSpy->Get(), -128));
-  EXPECT_STREQ("", systemCallLogger->Get());
-}
-
 TEST_F(IntervalTimerTest, Delete) {
   timer->Delete(&t);
 
