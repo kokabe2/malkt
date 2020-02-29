@@ -47,8 +47,12 @@ inline static void SendMail(Inbox self, void* mail) { tk_snd_mbx(self->mbx_id, (
 
 inline static bool PostTemplate(Inbox self, const void* message, int size, ComposeDelegate compose) {
   void* mail = compose(self, message, size);
-  if (mail) SendMail(self, mail);
-  return mail;
+  if (mail != NULL) {
+    SendMail(self, mail);
+    return true;
+  } else {
+    return false;
+  }
 }
 
 inline static void* GetMemoryBlock(Inbox self, int size, TMO timeout) {
@@ -62,7 +66,7 @@ inline static void EditMail(void* mail, const void* message, int size) { memcpy(
 
 static void* ComposeMail(Inbox self, const void* message, int size) {
   void* mail = GetMemoryBlock(self, size, TMO_POL);
-  if (mail) EditMail(mail, message, size);
+  if (mail != NULL) EditMail(mail, message, size);
   return mail;
 }
 
@@ -70,7 +74,7 @@ static bool Post(Inbox self, const void* message, int size) { return PostTemplat
 
 static void* BlockingComposeMail(Inbox self, const void* message, int size) {
   void* mail = GetMemoryBlock(self, size, TMO_FEVR);
-  if (mail) EditMail(mail, message, size);
+  if (mail != NULL) EditMail(mail, message, size);
   return mail;
 }
 
@@ -79,9 +83,10 @@ static bool BlockingPost(Inbox self, const void* message, int size) {
 }
 
 inline static void DeleteLastMailIfNeeded(Inbox self) {
-  if (!self->last_mail) return;
-  tk_rel_mpl(self->mpl_id, self->last_mail);
-  self->last_mail = NULL;
+  if (self->last_mail != NULL) {
+    tk_rel_mpl(self->mpl_id, self->last_mail);
+    self->last_mail = NULL;
+  }
 }
 
 inline static void* GetTemplate(Inbox self, GetDelegate get) {
@@ -90,15 +95,23 @@ inline static void* GetTemplate(Inbox self, GetDelegate get) {
 }
 
 static bool GetNextMail(Inbox self) {
-  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_POL) != E_OK) self->last_mail = NULL;  // Just in case.
-  return self->last_mail;
+  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_POL) == E_OK) {
+    return true;
+  } else {
+    self->last_mail = NULL;  // Just in case.
+    return false;
+  }
 }
 
 static void* Get(Inbox self) { return GetTemplate(self, GetNextMail); }
 
 static bool BlockingGetNextMail(Inbox self) {
-  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_FEVR) != E_OK) self->last_mail = NULL;  // Just in case.
-  return self->last_mail;
+  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_FEVR) == E_OK) {
+    return true;
+  } else {
+    self->last_mail = NULL;  // Just in case.
+    return false;
+  }
 }
 
 static void* BlockingGet(Inbox self) { return GetTemplate(self, BlockingGetNextMail); }
