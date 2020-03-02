@@ -8,7 +8,7 @@ cd %~dp0
 set COMPILER=ccrx
 set OUTPUT_DIR=bin\%COMPILER%@%PROJECT_VER%
 mkdir %OUTPUT_DIR% > NUL 2>&1
-%COMPILER% -output=obj -lang=c99 -nostuff -isa=rxv3 ^
+%COMPILER% -output=obj -lang=c99 -nostuff -isa=rxv3 -debug -signed_char ^
            -include=v1/,external/ ^
            src/utkernel/inbox/inbox.c ^
            src/utkernel/isr/isr.c ^
