@@ -26,3 +26,14 @@ TEST(UptimeTest, Get) {
   tk_set_tim(&pk_tim);
   EXPECT_EQ(0xA3579BE019ABCDF1, uptime->Get());
 }
+
+TEST(UptimeTest, Set) {
+  uptime->Set(0xFFFFFFFFFFFFFFFF);
+  EXPECT_EQ(0xFFFFFFFFFFFFFFFF, uptime->Get());
+
+  uptime->Set(0xA3579BE019ABCDF1);
+  EXPECT_EQ(0xA3579BE019ABCDF1, uptime->Get());
+
+  uptime->Set(0);
+  EXPECT_EQ(0, uptime->Get());
+}
