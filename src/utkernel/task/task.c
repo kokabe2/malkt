@@ -61,7 +61,7 @@ static Task New(ActionDelegate action, int priority, int stack_size) {
   return self;
 }
 
-inline static bool IsMyself(Task self) { return self->id == tk_get_tid(); }
+inline static bool IsRunning(Task self) { return self->id == tk_get_tid(); }
 
 inline static void KillMyself(Task* self) {
   heap->Delete((void**)self);
@@ -75,7 +75,7 @@ inline static void KillOther(Task* self) {
 }
 
 static void Delete(Task* self) {
-  if (IsMyself(*self))
+  if (IsRunning(*self))
     KillMyself(self);
   else
     KillOther(self);
@@ -99,7 +99,7 @@ inline static void SuspendOther(Task self) {
 static void Suspend(Task self) {
   if (IsSuspended(self)) return;
 
-  if (IsMyself(self))
+  if (IsRunning(self))
     Sleep(self);
   else
     SuspendOther(self);
@@ -113,10 +113,15 @@ static void Resume(Task self) {
   }
 }
 
-static void Delay(int time_in_milliseconds) { tk_dly_tsk(time_in_milliseconds); }
+static void Delay(int milliseconds) { tk_dly_tsk(milliseconds); }
 
 static const TaskMethodStruct kTheMethod = {
-    .New = New, .Delete = Delete, .Run = Run, .Suspend = Suspend, .Resume = Resume, .Delay = Delay,
+    .New = New,
+    .Delete = Delete,
+    .Run = Run,
+    .Suspend = Suspend,
+    .Resume = Resume,
+    .Delay = Delay,
 };
 
 const TaskMethod task = &kTheMethod;

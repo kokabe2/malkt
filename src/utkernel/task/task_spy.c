@@ -67,10 +67,15 @@ static void Suspend(Task self) { ++suspend_called_count; }
 
 static void Resume(Task self) { ++resume_called_count; }
 
-static void Delay(int time_in_milliseconds) { ++delay_called_count; }
+static void Delay(int milliseconds) { ++delay_called_count; }
 
 static const TaskMethodStruct kTheMethod = {
-    .New = New, .Delete = Delete, .Run = Run, .Suspend = Suspend, .Resume = Resume, .Delay = Delay,
+    .New = New,
+    .Delete = Delete,
+    .Run = Run,
+    .Suspend = Suspend,
+    .Resume = Resume,
+    .Delay = Delay,
 };
 
 const TaskMethod task = &kTheMethod;
