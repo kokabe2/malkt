@@ -10,8 +10,14 @@ static uint64_t Get(void) {
   return ((uint64_t)packet.hi << 32) + packet.lo;
 }
 
+static void Set(uint64_t milliseconds) {
+  SYSTIM packet = {.hi = (W)(milliseconds >> 32), .lo = (UW)(milliseconds & 0x00000000FFFFFFFF)};
+  tk_set_tim(&packet);
+}
+
 static const UptimeMethodStruct kTheMethod = {
     .Get = Get,
+    .Set = Set,
 };
 
 const UptimeMethod uptime = &kTheMethod;
