@@ -17,7 +17,7 @@ typedef struct {
   void (*Run)(Task self);
   void (*Suspend)(Task self);
   void (*Resume)(Task self);
-  void (*Delay)(int time_in_milliseconds);
+  void (*Delay)(int milliseconds);
 } TaskMethodStruct;
 typedef const TaskMethodStruct* TaskMethod;
 

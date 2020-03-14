@@ -113,7 +113,7 @@ static void Resume(Task self) {
   }
 }
 
-static void Delay(int time_in_milliseconds) { tk_dly_tsk(time_in_milliseconds); }
+static void Delay(int milliseconds) { tk_dly_tsk(milliseconds); }
 
 static const TaskMethodStruct kTheMethod = {
     .New = New,
