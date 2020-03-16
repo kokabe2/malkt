@@ -21,11 +21,11 @@ static void Reset(void) {
   its_interrupt_handler = NULL;
 }
 
-int InterruptNumber(void) { return its_interrupt_nubmer; }
+static int InterruptNumber(void) { return its_interrupt_nubmer; }
 
-int Level(void) { return its_level; }
+static int Level(void) { return its_level; }
 
-void RunHandler(void) { its_interrupt_handler(its_interrupt_nubmer); }
+static void RunHandler(void) { its_interrupt_handler(its_interrupt_nubmer); }
 
 static const IsrSpyMethodStruct kSpyMethod = {
     .Reset = Reset,
