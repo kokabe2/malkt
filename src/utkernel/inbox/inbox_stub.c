@@ -11,7 +11,10 @@ typedef struct InboxStruct {
 
 static InboxStruct the_instance;
 
-static Inbox New(int capacity) { return &the_instance; }
+static Inbox New(int capacity) {
+  the_instance.last_message = NULL;
+  return &the_instance;
+}
 
 static void Delete(Inbox* self) { heap->Delete(&(*self)->last_message); }
 
