@@ -13,7 +13,7 @@ static InboxStruct the_instance;
 
 static Inbox New(int capacity) { return &the_instance; }
 
-static void Delete(Inbox* self) { heap->Delete((*self)->last_message); }
+static void Delete(Inbox* self) { heap->Delete(&(*self)->last_message); }
 
 static bool Post(Inbox self, const void* message, int size) {
   Delete(&self);
