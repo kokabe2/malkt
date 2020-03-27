@@ -1,7 +1,7 @@
 // Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
-#ifndef SRC_UTKERNEL_INBOX_UTKERNEL_MBX_SPY_H_
-#define SRC_UTKERNEL_INBOX_UTKERNEL_MBX_SPY_H_
+#ifndef SRC_INBOX_UTKERNEL_UTKERNEL_MBX_SPY_H_
+#define SRC_INBOX_UTKERNEL_UTKERNEL_MBX_SPY_H_
 
 #include "utkernel/utkernel.h"
 
@@ -16,4 +16,4 @@ typedef const UtkernelMbxSpyMethodStruct* UtkernelMbxSpyMethod;
 
 extern const UtkernelMbxSpyMethod utkernelMbxSpy;
 
-#endif  // SRC_UTKERNEL_INBOX_UTKERNEL_MBX_SPY_H_
+#endif  // SRC_INBOX_UTKERNEL_UTKERNEL_MBX_SPY_H_

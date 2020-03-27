@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#include "../util/system_call_template.h"
+#include "../../util/system_call_template.h"
 
 typedef struct {
   SZ blksz;

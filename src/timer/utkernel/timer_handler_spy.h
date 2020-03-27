@@ -1,7 +1,7 @@
 // Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
-#ifndef SRC_UTKERNEL_TIMER_TIMER_HANDLER_SPY_H_
-#define SRC_UTKERNEL_TIMER_TIMER_HANDLER_SPY_H_
+#ifndef SRC_TIMER_UTKERNEL_TIMER_HANDLER_SPY_H_
+#define SRC_TIMER_UTKERNEL_TIMER_HANDLER_SPY_H_
 
 #include <stdbool.h>
 
@@ -16,4 +16,4 @@ typedef const TimerHandlerSpyMethodStruct* TimerHandlerSpyMethod;
 
 extern const TimerHandlerSpyMethod timerHandlerSpy;
 
-#endif  // SRC_UTKERNEL_TIMER_TIMER_HANDLER_SPY_H_
+#endif  // SRC_TIMER_UTKERNEL_TIMER_HANDLER_SPY_H_

@@ -1,7 +1,7 @@
 ﻿// Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
-#ifndef SRC_UTKERNEL_TIMER_TIMER_PROTECTED_H_
-#define SRC_UTKERNEL_TIMER_TIMER_PROTECTED_H_
+#ifndef SRC_TIMER_UTKERNEL_TIMER_PROTECTED_H_
+#define SRC_TIMER_UTKERNEL_TIMER_PROTECTED_H_
 
 #include "timer.h"
 
@@ -18,4 +18,4 @@ typedef const TimerProtectedMethodStruct* TimerProtectedMethod;
 
 extern const TimerProtectedMethod _timer;
 
-#endif  // SRC_UTKERNEL_TIMER_TIMER_PROTECTED_H_
+#endif  // SRC_TIMER_UTKERNEL_TIMER_PROTECTED_H_

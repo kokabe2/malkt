@@ -6,15 +6,15 @@ include_directories(
 
 add_library(
     malkt
+    inbox/utkernel/inbox.c
+    isr/utkernel/isr.c
+    memory_pool/utkernel/memory_pool.c
+    task/utkernel/task.c
     time/utkernel/time_unit.c
-    utkernel/inbox/inbox.c
-    utkernel/isr/isr.c
-    utkernel/memory_pool/memory_pool.c
-    utkernel/task/task.c
-    utkernel/timer/interval_timer.c
-    utkernel/timer/one_shot_timer.c
-    utkernel/timer/timer.c
-    utkernel/uptime/uptime.c
+    timer/utkernel/interval_timer.c
+    timer/utkernel/one_shot_timer.c
+    timer/utkernel/timer.c
+    uptime/utkernel/uptime.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/heap_usage.c
     )
@@ -22,27 +22,27 @@ add_library(
 add_executable(
     gtests
     main.cpp
+    inbox/utkernel/inbox_test.cpp
+    inbox/utkernel/utkernel_mbx_spy.c
+    inbox/utkernel/utkernel_mpl_spy.c
+    isr/utkernel/isr_test.cpp
+    isr/utkernel/utkernel_int_spy.c
+    memory_pool/utkernel/memory_pool_test.cpp
+    memory_pool/utkernel/utkernel_mpf_spy.c
+    task/utkernel/function_entry_spy.c
+    task/utkernel/utkernel_tsk_spy.c
+    task/utkernel/task_test.cpp
     time/utkernel/time_unit_test.cpp
-    utkernel/inbox/inbox_test.cpp
-    utkernel/inbox/utkernel_mbx_spy.c
-    utkernel/inbox/utkernel_mpl_spy.c
-    utkernel/isr/isr_test.cpp
-    utkernel/isr/utkernel_int_spy.c
-    utkernel/memory_pool/memory_pool_test.cpp
-    utkernel/memory_pool/utkernel_mpf_spy.c
-    utkernel/task/function_entry_spy.c
-    utkernel/task/utkernel_tsk_spy.c
-    utkernel/task/task_test.cpp
-    utkernel/timer/interval_timer_test.cpp
-    utkernel/timer/one_shot_timer_test.cpp
-    utkernel/timer/timer_handler_spy.c
-    utkernel/timer/utkernel_cyc_spy.c
-    utkernel/uptime/utkernel_tim_fake.c
-    utkernel/uptime/uptime_test.cpp
-    utkernel/util/system_call_logger.c
-    utkernel/util/system_call_logger_test.cpp
-    utkernel/util/system_call_template.c
-    utkernel/util/system_call_template_test.cpp
+    timer/utkernel/interval_timer_test.cpp
+    timer/utkernel/one_shot_timer_test.cpp
+    timer/utkernel/timer_handler_spy.c
+    timer/utkernel/utkernel_cyc_spy.c
+    uptime/utkernel/uptime_test.cpp
+    uptime/utkernel/utkernel_tim_fake.c
+    util/system_call_logger.c
+    util/system_call_logger_test.cpp
+    util/system_call_template.c
+    util/system_call_template_test.cpp
     )
 
 add_dependencies(gtests googletest)

@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "../util/system_call_logger.h"
+#include "../../util/system_call_logger.h"
 #include "memory_pool.h"
 #include "utkernel_mpf_spy.h"
 }
