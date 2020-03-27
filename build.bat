@@ -18,7 +18,7 @@ mkdir %OUTPUT_DIR% > NUL 2>&1
            src/utkernel/timer/interval_timer.c ^
            src/utkernel/timer/one_shot_timer.c ^
            src/utkernel/timer/timer.c ^
-           src/utkernel/uptime/uptime.c
+           src/uptime/utkernel/uptime.c
 if %errorlevel% neq 0 exit /b
 
 rlink -form=lib -output=%OUTPUT_DIR%/%PROJECT_NAME%.lib *.obj

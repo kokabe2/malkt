@@ -7,6 +7,7 @@ include_directories(
 add_library(
     malkt
     time/utkernel/time_unit.c
+    uptime/utkernel/uptime.c
     utkernel/inbox/inbox.c
     utkernel/isr/isr.c
     utkernel/memory_pool/memory_pool.c
@@ -14,7 +15,6 @@ add_library(
     utkernel/timer/interval_timer.c
     utkernel/timer/one_shot_timer.c
     utkernel/timer/timer.c
-    utkernel/uptime/uptime.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/heap_usage.c
     )
@@ -23,6 +23,8 @@ add_executable(
     gtests
     main.cpp
     time/utkernel/time_unit_test.cpp
+    uptime/utkernel/uptime_test.cpp
+    uptime/utkernel/utkernel_tim_fake.c
     utkernel/inbox/inbox_test.cpp
     utkernel/inbox/utkernel_mbx_spy.c
     utkernel/inbox/utkernel_mpl_spy.c
@@ -37,8 +39,6 @@ add_executable(
     utkernel/timer/one_shot_timer_test.cpp
     utkernel/timer/timer_handler_spy.c
     utkernel/timer/utkernel_cyc_spy.c
-    utkernel/uptime/utkernel_tim_fake.c
-    utkernel/uptime/uptime_test.cpp
     utkernel/util/system_call_logger.c
     utkernel/util/system_call_logger_test.cpp
     utkernel/util/system_call_template.c
