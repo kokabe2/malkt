@@ -6,6 +6,7 @@ include_directories(
 
 add_library(
     malkt
+    time/utkernel/time_unit.c
     utkernel/inbox/inbox.c
     utkernel/isr/isr.c
     utkernel/memory_pool/memory_pool.c
@@ -21,6 +22,7 @@ add_library(
 add_executable(
     gtests
     main.cpp
+    time/utkernel/time_unit_test.cpp
     utkernel/inbox/inbox_test.cpp
     utkernel/inbox/utkernel_mbx_spy.c
     utkernel/inbox/utkernel_mpl_spy.c
