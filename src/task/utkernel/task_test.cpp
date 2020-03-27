@@ -3,7 +3,7 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "../util/system_call_logger.h"
+#include "../../util/system_call_logger.h"
 #include "function_entry_spy.h"
 #include "task.h"
 #include "utkernel_tsk_spy.h"

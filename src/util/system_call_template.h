@@ -1,7 +1,7 @@
 ﻿// Copyright(c) 2020 Ken Okabe
 // This software is released under the MIT License, see LICENSE.
-#ifndef SRC_UTKERNEL_UTIL_SYSTEM_CALL_TEMPLATE_H_
-#define SRC_UTKERNEL_UTIL_SYSTEM_CALL_TEMPLATE_H_
+#ifndef SRC_UTIL_SYSTEM_CALL_TEMPLATE_H_
+#define SRC_UTIL_SYSTEM_CALL_TEMPLATE_H_
 
 typedef void (*ExecuteDelegate)(const void* info);
 typedef struct {
@@ -13,4 +13,4 @@ typedef const SystemCallTemplateMethodStruct* SystemCallTemplateMethod;
 
 extern const SystemCallTemplateMethod systemCallTemplate;
 
-#endif  // SRC_UTKERNEL_UTIL_SYSTEM_CALL_TEMPLATE_H_
+#endif  // SRC_UTIL_SYSTEM_CALL_TEMPLATE_H_

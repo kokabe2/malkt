@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../util/system_call_template.h"
+#include "../../util/system_call_template.h"
 
 typedef struct {
   T_MSG** ppk_msg;

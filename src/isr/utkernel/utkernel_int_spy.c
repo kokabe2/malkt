@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-#include "../util/system_call_template.h"
+#include "../../util/system_call_template.h"
 
 static ATR its_attribute;
 static FP its_interrupt_handler;

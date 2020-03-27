@@ -10,14 +10,14 @@ set OUTPUT_DIR=bin\%COMPILER%@%PROJECT_VER%
 mkdir %OUTPUT_DIR% > NUL 2>&1
 %COMPILER% -output=obj -lang=c99 -nostuff -isa=rxv3 -debug -signed_char ^
            -include=v1/,external/ ^
+           src/inbox/utkernel/inbox.c ^
+           src/isr/utkernel/isr.c ^
+           src/memory_pool/utkernel/memory_pool.c ^
+           src/task/utkernel/task.c ^
            src/time/utkernel/time_unit.c ^
-           src/utkernel/inbox/inbox.c ^
-           src/utkernel/isr/isr.c ^
-           src/utkernel/memory_pool/memory_pool.c ^
-           src/utkernel/task/task.c ^
-           src/utkernel/timer/interval_timer.c ^
-           src/utkernel/timer/one_shot_timer.c ^
-           src/utkernel/timer/timer.c ^
+           src/timer/utkernel/interval_timer.c ^
+           src/timer/utkernel/one_shot_timer.c ^
+           src/timer/utkernel/timer.c ^
            src/uptime/utkernel/uptime.c
 if %errorlevel% neq 0 exit /b
 
