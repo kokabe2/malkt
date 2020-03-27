@@ -12,8 +12,8 @@ typedef struct IsrStruct {
   int interrupt_number;  //
 } IsrStruct;
 
-inline static void Register(Isr self, InterruptDelegate interrupt) {
-  T_DINT packet = {.intatr = TA_HLNG, .inthdr = (FP)interrupt};
+inline static void Register(Isr self, InterruptDelegate delegate) {
+  T_DINT packet = {.intatr = TA_HLNG, .inthdr = (FP)delegate};
   tk_def_int((UINT)self->interrupt_number, &packet);
 }
 
@@ -39,7 +39,10 @@ static void Enable(Isr self, int level) { EnableInt((UINT)self->interrupt_number
 static void Disable(Isr self) { DisableInt((UINT)self->interrupt_number); }
 
 static const IsrMethodStruct kTheMethod = {
-    .New = New, .Delete = Delete, .Enable = Enable, .Disable = Disable,
+    .New = New,
+    .Delete = Delete,
+    .Enable = Enable,
+    .Disable = Disable,
 };
 
 const IsrMethod isr = &kTheMethod;

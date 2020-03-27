@@ -6,7 +6,7 @@
 typedef void (*InterruptDelegate)(int interrupt_number);
 typedef struct IsrStruct* Isr;
 typedef struct {
-  Isr (*New)(int interrupt_number, InterruptDelegate interrupt);
+  Isr (*New)(int interrupt_number, InterruptDelegate delegate);
   void (*Delete)(Isr* self);
   void (*Enable)(Isr self, int level);
   void (*Disable)(Isr self);
