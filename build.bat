@@ -21,7 +21,7 @@ mkdir %OUTPUT_DIR% > NUL 2>&1
            src/time/utkernel/time_unit.c ^
            src/timer/utkernel/interval_timer.c ^
            src/timer/utkernel/one_shot_timer.c ^
-           src/timer/utkernel/timer.c ^
+           src/timer/timer.c ^
            src/uptime/utkernel/uptime.c
 if %errorlevel% neq 0 exit /b
 

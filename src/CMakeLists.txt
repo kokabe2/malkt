@@ -17,7 +17,7 @@ add_library(
     time/utkernel/time_unit.c
     timer/utkernel/interval_timer.c
     timer/utkernel/one_shot_timer.c
-    timer/utkernel/timer.c
+    timer/timer.c
     uptime/utkernel/uptime.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/heap_usage.c
@@ -38,7 +38,6 @@ add_executable(
     time/utkernel/time_unit_test.cpp
     timer/utkernel/interval_timer_test.cpp
     timer/utkernel/one_shot_timer_test.cpp
-    timer/utkernel/timer_handler_spy.c
     timer/utkernel/utkernel_cyc_spy.c
     uptime/utkernel/uptime_test.cpp
     uptime/utkernel/utkernel_tim_fake.c

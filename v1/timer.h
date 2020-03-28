@@ -3,15 +3,14 @@
 #ifndef V1_TIMER_H_
 #define V1_TIMER_H_
 
-typedef void (*TimerDelegate)(void);
 typedef struct TimerStruct* Timer;
 typedef struct {
   void (*Delete)(Timer* self);
   void (*Pause)(Timer self);
-  void (*Resume)(Timer self);  // Abstract method
-} TimerAbstractMethodStruct;
-typedef const TimerAbstractMethodStruct* TimerAbstractMethod;
+  void (*Resume)(Timer self);
+} TimerInterfaceStruct;
+typedef const TimerInterfaceStruct* TimerInterface;
 
-extern const TimerAbstractMethod timer;
+extern const TimerInterface timer;
 
 #endif  // V1_TIMER_H_
