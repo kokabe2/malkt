@@ -12,7 +12,7 @@ namespace {
 void DummyInterrupt(int unused) {}
 }  // namespace
 
-class IsrTest : public ::testing::Test {
+class BasicIsrTest : public ::testing::Test {
  protected:
   Isr i;
 
@@ -31,7 +31,7 @@ class IsrTest : public ::testing::Test {
   }
 };
 
-TEST_F(IsrTest, New) {
+TEST_F(BasicIsrTest, New) {
   i = basicIsr->New(24, 8, DummyInterrupt);
 
   ASSERT_TRUE(i != NULL);
@@ -43,7 +43,7 @@ TEST_F(IsrTest, New) {
       systemCallLogger->Get());
 }
 
-TEST_F(IsrTest, Delete) {
+TEST_F(BasicIsrTest, Delete) {
   NewBasicIsr();
 
   isr->Delete(&i);
@@ -58,7 +58,7 @@ TEST_F(IsrTest, Delete) {
       systemCallLogger->Get());
 }
 
-TEST_F(IsrTest, Enable) {
+TEST_F(BasicIsrTest, Enable) {
   NewBasicIsr();
 
   isr->Enable(i);
@@ -70,7 +70,7 @@ TEST_F(IsrTest, Enable) {
       systemCallLogger->Get());
 }
 
-TEST_F(IsrTest, Disable) {
+TEST_F(BasicIsrTest, Disable) {
   NewBasicIsr();
 
   isr->Disable(i);
