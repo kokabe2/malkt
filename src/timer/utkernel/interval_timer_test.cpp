@@ -5,18 +5,23 @@
 extern "C" {
 #include "../../util/system_call_logger.h"
 #include "interval_timer.h"
-#include "timer_handler_spy.h"
 #include "utkernel_cyc_spy.h"
 }
+
+namespace {
+bool was_ran;
+
+void TimerSpy(void) { was_ran = true; }
+}  // namespace
 
 class IntervalTimerTest : public ::testing::Test {
  protected:
   Timer t;
 
   virtual void SetUp() {
-    timerHandlerSpy->Reset();
+    was_ran = false;
     utkernelCycSpy->Reset();
-    t = intervalTimer->New(timerHandlerSpy->Get(), 10);
+    t = intervalTimer->New(TimerSpy, 10);
     systemCallLogger->Reset();
   }
 
@@ -26,7 +31,7 @@ class IntervalTimerTest : public ::testing::Test {
 };
 
 TEST_F(IntervalTimerTest, New) {
-  Timer instance = intervalTimer->New(timerHandlerSpy->Get(), 10);
+  Timer instance = intervalTimer->New(TimerSpy, 10);
 
   EXPECT_TRUE(instance != NULL);
   EXPECT_EQ((TA_HLNG | TA_STA | TA_PHS), utkernelCycSpy->Attribute());
@@ -37,9 +42,9 @@ TEST_F(IntervalTimerTest, New) {
       "- tk_cre_cyc (0)\n",
       systemCallLogger->Get());
 
-  EXPECT_FALSE(timerHandlerSpy->WasRun());
+  EXPECT_FALSE(was_ran);
   utkernelCycSpy->RunTimer();
-  EXPECT_TRUE(timerHandlerSpy->WasRun());
+  EXPECT_TRUE(was_ran);
 
   timer->Delete(&instance);
 }

@@ -5,18 +5,23 @@
 extern "C" {
 #include "../../util/system_call_logger.h"
 #include "one_shot_timer.h"
-#include "timer_handler_spy.h"
 #include "utkernel_cyc_spy.h"
 }
+
+namespace {
+bool was_ran;
+
+void TimerSpy(void) { was_ran = true; }
+}  // namespace
 
 class OneShotTimerTest : public ::testing::Test {
  protected:
   Timer t;
 
   virtual void SetUp() {
-    timerHandlerSpy->Reset();
+    was_ran = false;
     utkernelCycSpy->Reset();
-    t = oneShotTimer->New(timerHandlerSpy->Get(), 10);
+    t = oneShotTimer->New(TimerSpy, 10);
     systemCallLogger->Reset();
   }
 
@@ -26,7 +31,7 @@ class OneShotTimerTest : public ::testing::Test {
 };
 
 TEST_F(OneShotTimerTest, New) {
-  Timer instance = oneShotTimer->New(timerHandlerSpy->Get(), 10);
+  Timer instance = oneShotTimer->New(TimerSpy, 10);
 
   EXPECT_TRUE(instance != NULL);
   EXPECT_EQ((TA_HLNG | TA_STA | TA_PHS), utkernelCycSpy->Attribute());
@@ -37,9 +42,9 @@ TEST_F(OneShotTimerTest, New) {
       "- tk_cre_cyc (0)\n",
       systemCallLogger->Get());
 
-  EXPECT_FALSE(timerHandlerSpy->WasRun());
+  EXPECT_FALSE(was_ran);
   utkernelCycSpy->RunTimer();
-  EXPECT_TRUE(timerHandlerSpy->WasRun());
+  EXPECT_TRUE(was_ran);
 
   timer->Delete(&instance);
 }
@@ -69,9 +74,9 @@ TEST_F(OneShotTimerTest, IsDone) {
 
 TEST_F(OneShotTimerTest, RunTimerOnlyOnce) {
   utkernelCycSpy->RunTimer();
-  timerHandlerSpy->Reset();
+  was_ran = false;
 
   utkernelCycSpy->RunTimer();
 
-  EXPECT_FALSE(timerHandlerSpy->WasRun());
+  EXPECT_FALSE(was_ran);
 }

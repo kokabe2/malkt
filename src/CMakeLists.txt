@@ -38,7 +38,6 @@ add_executable(
     time/utkernel/time_unit_test.cpp
     timer/utkernel/interval_timer_test.cpp
     timer/utkernel/one_shot_timer_test.cpp
-    timer/utkernel/timer_handler_spy.c
     timer/utkernel/utkernel_cyc_spy.c
     uptime/utkernel/uptime_test.cpp
     uptime/utkernel/utkernel_tim_fake.c
