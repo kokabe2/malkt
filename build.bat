@@ -14,7 +14,8 @@ mkdir %OUTPUT_DIR% > NUL 2>&1
            src/inbox/inbox.c ^
            src/isr/utkernel/basic_isr.c ^
            src/isr/isr.c ^
-           src/memory_pool/utkernel/memory_pool.c ^
+           src/memory_pool/utkernel/basic_memory_pool.c ^
+           src/memory_pool/memory_pool.c ^
            src/task/utkernel/simple_task.c ^
            src/task/task.c ^
            src/time/utkernel/time_unit.c ^

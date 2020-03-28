@@ -10,7 +10,8 @@ add_library(
     inbox/inbox.c
     isr/utkernel/basic_isr.c
     isr/isr.c
-    memory_pool/utkernel/memory_pool.c
+    memory_pool/utkernel/basic_memory_pool.c
+    memory_pool/memory_pool.c
     task/utkernel/simple_task.c
     task/task.c
     time/utkernel/time_unit.c
@@ -30,7 +31,7 @@ add_executable(
     inbox/utkernel/utkernel_mpl_spy.c
     isr/utkernel/basic_isr_test.cpp
     isr/utkernel/utkernel_int_spy.c
-    memory_pool/utkernel/memory_pool_test.cpp
+    memory_pool/utkernel/basic_memory_pool_test.cpp
     memory_pool/utkernel/utkernel_mpf_spy.c
     task/utkernel/simple_task_test.cpp
     task/utkernel/utkernel_tsk_spy.c
