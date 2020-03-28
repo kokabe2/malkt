@@ -21,19 +21,23 @@ class IntervalTimerTest : public ::testing::Test {
   virtual void SetUp() {
     was_ran = false;
     utkernelCycSpy->Reset();
-    t = intervalTimer->New(TimerSpy, 10);
     systemCallLogger->Reset();
   }
 
   virtual void TearDown() {
     if (t != NULL) timer->Delete(&t);
   }
+
+  void NewIntervalTimer() {
+    t = intervalTimer->New(TimerSpy, 10);
+    systemCallLogger->Reset();
+  }
 };
 
 TEST_F(IntervalTimerTest, New) {
-  Timer instance = intervalTimer->New(TimerSpy, 10);
+  t = intervalTimer->New(TimerSpy, 10);
 
-  EXPECT_TRUE(instance != NULL);
+  EXPECT_TRUE(t != NULL);
   EXPECT_EQ((TA_HLNG | TA_STA | TA_PHS), utkernelCycSpy->Attribute());
   EXPECT_EQ(10, utkernelCycSpy->CycleTime());
   EXPECT_EQ(10, utkernelCycSpy->CyclePhase());
@@ -45,11 +49,11 @@ TEST_F(IntervalTimerTest, New) {
   EXPECT_FALSE(was_ran);
   utkernelCycSpy->RunTimer();
   EXPECT_TRUE(was_ran);
-
-  timer->Delete(&instance);
 }
 
 TEST_F(IntervalTimerTest, Delete) {
+  NewIntervalTimer();
+
   timer->Delete(&t);
 
   EXPECT_EQ(NULL, t);
@@ -60,6 +64,8 @@ TEST_F(IntervalTimerTest, Delete) {
 }
 
 TEST_F(IntervalTimerTest, Pause) {
+  NewIntervalTimer();
+
   timer->Pause(t);
 
   EXPECT_STREQ(
@@ -69,6 +75,8 @@ TEST_F(IntervalTimerTest, Pause) {
 }
 
 TEST_F(IntervalTimerTest, Resume) {
+  NewIntervalTimer();
+
   timer->Resume(t);
 
   EXPECT_STREQ(
