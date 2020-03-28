@@ -21,19 +21,23 @@ class TaskTest : public ::testing::Test {
   virtual void SetUp() {
     was_ran = false;
     utkernelTskSpy->Reset();
-    t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
     systemCallLogger->Reset();
   }
 
   virtual void TearDown() {
     if (t != NULL) task->Delete(&t);
   }
+
+  void NewSimpleTask() {
+    t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
+    systemCallLogger->Reset();
+  }
 };
 
 TEST_F(TaskTest, New) {
-  Task instance = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
+  t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
 
-  ASSERT_TRUE(instance != NULL);
+  ASSERT_TRUE(t != NULL);
   EXPECT_EQ(TA_HLNG | TA_RNG0, utkernelTskSpy->Attribute());
   EXPECT_EQ(9, utkernelTskSpy->Priority());
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
@@ -42,39 +46,35 @@ TEST_F(TaskTest, New) {
       "+ tk_cre_tsk\n"
       "- tk_cre_tsk (0)\n",
       systemCallLogger->Get());
-
-  task->Delete(&instance);
 }
 
 TEST_F(TaskTest, NewWithBoundaryPriority) {
-  Task highest_priority = simpleTask->New(DummyAction, kHighestTaskPriority, kMaxTaskStackSize);
+  t = simpleTask->New(DummyAction, kHighestTaskPriority, kMaxTaskStackSize);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
-  task->Delete(&highest_priority);
+  task->Delete(&t);
 
-  Task lowest_priority = simpleTask->New(DummyAction, kLowestTaskPriority, kMaxTaskStackSize);
+  t = simpleTask->New(DummyAction, kLowestTaskPriority, kMaxTaskStackSize);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
-  task->Delete(&lowest_priority);
 }
 
-TEST_F(TaskTest, NewWithOutRangeOfPriority) {
-  Task highest_priority = simpleTask->New(DummyAction, kHighestTaskPriority + 1, kMaxTaskStackSize);
+TEST_F(TaskTest, NewWithOutOfRangePriority) {
+  t = simpleTask->New(DummyAction, kHighestTaskPriority + 1, kMaxTaskStackSize);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
-  task->Delete(&highest_priority);
+  task->Delete(&t);
 
-  Task lowest_priority = simpleTask->New(DummyAction, kLowestTaskPriority - 1, kMaxTaskStackSize);
+  t = simpleTask->New(DummyAction, kLowestTaskPriority - 1, kMaxTaskStackSize);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
-  task->Delete(&lowest_priority);
 }
 
-TEST_F(TaskTest, NewWithOutRangeOfStackSize) {
-  Task instance = simpleTask->New(DummyAction, 4, kMaxTaskStackSize + 1);
+TEST_F(TaskTest, NewWithOutOfRangeStackSize) {
+  Task t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize + 1);
 
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
-
-  task->Delete(&instance);
 }
 
 TEST_F(TaskTest, DeleteSelfTask) {
+  NewSimpleTask();
+
   task->Delete(&t);
 
   EXPECT_EQ(NULL, t);
@@ -87,6 +87,7 @@ TEST_F(TaskTest, DeleteSelfTask) {
 }
 
 TEST_F(TaskTest, DeleteOtherTask) {
+  NewSimpleTask();
   utkernelTskSpy->SetReturnCode(0, 1);
 
   task->Delete(&t);
@@ -103,6 +104,8 @@ TEST_F(TaskTest, DeleteOtherTask) {
 }
 
 TEST_F(TaskTest, Run) {
+  NewSimpleTask();
+
   task->Run(t);
 
   EXPECT_TRUE(was_ran);
@@ -115,6 +118,8 @@ TEST_F(TaskTest, Run) {
 }
 
 TEST_F(TaskTest, SuspendSelfTask) {
+  NewSimpleTask();
+
   task->Suspend(t);
 
   EXPECT_EQ(TMO_FEVR, utkernelTskSpy->Timeout());
@@ -127,6 +132,7 @@ TEST_F(TaskTest, SuspendSelfTask) {
 }
 
 TEST_F(TaskTest, SuspendOtherTask) {
+  NewSimpleTask();
   utkernelTskSpy->SetReturnCode(0, 1);
 
   task->Suspend(t);
@@ -142,6 +148,8 @@ TEST_F(TaskTest, SuspendOtherTask) {
 }
 
 TEST_F(TaskTest, SuspendMultipleTimes) {
+  NewSimpleTask();
+
   task->Suspend(t);
   task->Suspend(t);
   task->Suspend(t);
@@ -155,6 +163,7 @@ TEST_F(TaskTest, SuspendMultipleTimes) {
 }
 
 TEST_F(TaskTest, ResumeTaskSuspendedByMyself) {
+  NewSimpleTask();
   task->Suspend(t);
   systemCallLogger->Reset();
 
@@ -167,6 +176,7 @@ TEST_F(TaskTest, ResumeTaskSuspendedByMyself) {
 }
 
 TEST_F(TaskTest, ResumeTaskSuspendedByOther) {
+  NewSimpleTask();
   utkernelTskSpy->SetReturnCode(0, 1);
   task->Suspend(t);
   systemCallLogger->Reset();
@@ -180,12 +190,15 @@ TEST_F(TaskTest, ResumeTaskSuspendedByOther) {
 }
 
 TEST_F(TaskTest, ResumeTaskNotSuspended) {
+  NewSimpleTask();
+
   task->Resume(t);
 
   EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(TaskTest, ResumeMultipleTimes) {
+  NewSimpleTask();
   task->Suspend(t);
   systemCallLogger->Reset();
 
