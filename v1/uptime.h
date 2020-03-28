@@ -6,8 +6,8 @@
 #include <stdint.h>
 
 typedef struct {
-  uint64_t (*Get)(void);
-  void (*Set)(uint64_t milliseconds);
+  int64_t (*Get)(void);
+  void (*Set)(int64_t milliseconds);
 } UptimeMethodStruct;
 typedef const UptimeMethodStruct* UptimeMethod;
 
