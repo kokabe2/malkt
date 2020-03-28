@@ -12,6 +12,7 @@ add_library(
     isr/isr.c
     memory_pool/utkernel/basic_memory_pool.c
     memory_pool/memory_pool.c
+    task/utkernel/objectizable_task.c
     task/utkernel/simple_task.c
     task/task.c
     time/utkernel/time_unit.c
@@ -33,6 +34,7 @@ add_executable(
     isr/utkernel/utkernel_int_spy.c
     memory_pool/utkernel/basic_memory_pool_test.cpp
     memory_pool/utkernel/utkernel_mpf_spy.c
+    task/utkernel/objectizable_task_test.cpp
     task/utkernel/simple_task_test.cpp
     task/utkernel/utkernel_tsk_spy.c
     time/utkernel/time_unit_test.cpp
