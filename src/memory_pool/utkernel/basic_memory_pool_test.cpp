@@ -19,19 +19,23 @@ class MemoryPoolTest : public ::testing::Test {
 
   virtual void SetUp() {
     utkernelMpfSpy->Reset();
-    mp = basicMemoryPool->New(memory_area, sizeof(memory_area), 32);
     systemCallLogger->Reset();
   }
 
   virtual void TearDown() {
     if (mp != NULL) memoryPool->Delete(&mp);
   }
+
+  void NewBasicMemoryPool() {
+    mp = basicMemoryPool->New(memory_area, sizeof(memory_area), 32);
+    systemCallLogger->Reset();
+  }
 };
 
 TEST_F(MemoryPoolTest, New) {
-  MemoryPool instance = basicMemoryPool->New(memory_area, sizeof(memory_area), 32);
+  mp = basicMemoryPool->New(memory_area, sizeof(memory_area), 32);
 
-  ASSERT_TRUE(instance != NULL);
+  ASSERT_TRUE(mp != NULL);
   EXPECT_EQ((TA_TFIFO | TA_RNG0 | TA_USERBUF), utkernelMpfSpy->Attribute());
   EXPECT_EQ(16, utkernelMpfSpy->BlockCount());
   EXPECT_EQ(32, utkernelMpfSpy->BlockSize());
@@ -40,11 +44,11 @@ TEST_F(MemoryPoolTest, New) {
       "+ tk_cre_mpf\n"
       "- tk_cre_mpf (0)\n",
       systemCallLogger->Get());
-
-  memoryPool->Delete(&instance);
 }
 
 TEST_F(MemoryPoolTest, Delete) {
+  NewBasicMemoryPool();
+
   memoryPool->Delete(&mp);
 
   EXPECT_EQ(NULL, mp);
@@ -55,6 +59,8 @@ TEST_F(MemoryPoolTest, Delete) {
 }
 
 TEST_F(MemoryPoolTest, Get) {
+  NewBasicMemoryPool();
+
   EXPECT_TRUE(memoryPool->Get(mp) != NULL);
   EXPECT_EQ(TMO_POL, utkernelMpfSpy->Timout());
   EXPECT_STREQ(
@@ -64,6 +70,7 @@ TEST_F(MemoryPoolTest, Get) {
 }
 
 TEST_F(MemoryPoolTest, GetWhenMemoryBlockAcquisitionFailed) {
+  NewBasicMemoryPool();
   utkernelMpfSpy->SetReturnCode(0, -50);
 
   EXPECT_EQ(NULL, memoryPool->Get(mp));
@@ -74,6 +81,7 @@ TEST_F(MemoryPoolTest, GetWhenMemoryBlockAcquisitionFailed) {
 }
 
 TEST_F(MemoryPoolTest, Release) {
+  NewBasicMemoryPool();
   void *block = memoryPool->Get(mp);
   systemCallLogger->Reset();
 
