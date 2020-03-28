@@ -5,7 +5,7 @@
 
 extern "C" {
 #include "../../util/system_call_logger.h"
-#include "memory_pool.h"
+#include "basic_memory_pool.h"
 #include "utkernel_mpf_spy.h"
 }
 
@@ -19,7 +19,7 @@ class MemoryPoolTest : public ::testing::Test {
 
   virtual void SetUp() {
     utkernelMpfSpy->Reset();
-    mp = memoryPool->New(memory_area, sizeof(memory_area), 32);
+    mp = basicMemoryPool->New(memory_area, sizeof(memory_area), 32);
     systemCallLogger->Reset();
   }
 
@@ -29,7 +29,7 @@ class MemoryPoolTest : public ::testing::Test {
 };
 
 TEST_F(MemoryPoolTest, New) {
-  MemoryPool instance = memoryPool->New(memory_area, sizeof(memory_area), 32);
+  MemoryPool instance = basicMemoryPool->New(memory_area, sizeof(memory_area), 32);
 
   ASSERT_TRUE(instance != NULL);
   EXPECT_EQ((TA_TFIFO | TA_RNG0 | TA_USERBUF), utkernelMpfSpy->Attribute());

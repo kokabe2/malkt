@@ -5,13 +5,12 @@
 
 typedef struct MemoryPoolStruct* MemoryPool;
 typedef struct {
-  MemoryPool (*New)(void* memory_area, int capacity, int block_size);
   void (*Delete)(MemoryPool* self);
   void* (*Get)(MemoryPool self);
   void (*Release)(MemoryPool self, void* block);
-} MemoryPoolMethodStruct;
-typedef const MemoryPoolMethodStruct* MemoryPoolMethod;
+} MemoryPoolInterfaceStruct;
+typedef const MemoryPoolInterfaceStruct* MemoryPoolInterface;
 
-extern const MemoryPoolMethod memoryPool;
+extern const MemoryPoolInterface memoryPool;
 
 #endif  // V1_MEMORY_POOL_H_
