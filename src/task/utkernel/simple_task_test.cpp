@@ -4,7 +4,7 @@
 
 extern "C" {
 #include "../../util/system_call_logger.h"
-#include "task.h"
+#include "simple_task.h"
 #include "utkernel_tsk_spy.h"
 }
 
@@ -21,7 +21,7 @@ class TaskTest : public ::testing::Test {
   virtual void SetUp() {
     was_ran = false;
     utkernelTskSpy->Reset();
-    t = task->New(DummyAction, 4, kMaxTaskStackSize);
+    t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
     systemCallLogger->Reset();
   }
 
@@ -31,7 +31,7 @@ class TaskTest : public ::testing::Test {
 };
 
 TEST_F(TaskTest, New) {
-  Task instance = task->New(DummyAction, 4, kMaxTaskStackSize);
+  Task instance = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
 
   ASSERT_TRUE(instance != NULL);
   EXPECT_EQ(TA_HLNG | TA_RNG0, utkernelTskSpy->Attribute());
@@ -47,27 +47,27 @@ TEST_F(TaskTest, New) {
 }
 
 TEST_F(TaskTest, NewWithBoundaryPriority) {
-  Task highest_priority = task->New(DummyAction, kHighestTaskPriority, kMaxTaskStackSize);
+  Task highest_priority = simpleTask->New(DummyAction, kHighestTaskPriority, kMaxTaskStackSize);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
   task->Delete(&highest_priority);
 
-  Task lowest_priority = task->New(DummyAction, kLowestTaskPriority, kMaxTaskStackSize);
+  Task lowest_priority = simpleTask->New(DummyAction, kLowestTaskPriority, kMaxTaskStackSize);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
   task->Delete(&lowest_priority);
 }
 
 TEST_F(TaskTest, NewWithOutRangeOfPriority) {
-  Task highest_priority = task->New(DummyAction, kHighestTaskPriority + 1, kMaxTaskStackSize);
+  Task highest_priority = simpleTask->New(DummyAction, kHighestTaskPriority + 1, kMaxTaskStackSize);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
   task->Delete(&highest_priority);
 
-  Task lowest_priority = task->New(DummyAction, kLowestTaskPriority - 1, kMaxTaskStackSize);
+  Task lowest_priority = simpleTask->New(DummyAction, kLowestTaskPriority - 1, kMaxTaskStackSize);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
   task->Delete(&lowest_priority);
 }
 
 TEST_F(TaskTest, NewWithOutRangeOfStackSize) {
-  Task instance = task->New(DummyAction, 4, kMaxTaskStackSize + 1);
+  Task instance = simpleTask->New(DummyAction, 4, kMaxTaskStackSize + 1);
 
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
 
@@ -196,15 +196,5 @@ TEST_F(TaskTest, ResumeMultipleTimes) {
   EXPECT_STREQ(
       "+ tk_wup_tsk (0)\n"
       "- tk_wup_tsk (0)\n",
-      systemCallLogger->Get());
-}
-
-TEST_F(TaskTest, Delay) {
-  task->Delay(100);
-
-  EXPECT_EQ(100, utkernelTskSpy->DelayTime());
-  EXPECT_STREQ(
-      "+ tk_dly_tsk\n"
-      "- tk_dly_tsk (0)\n",
       systemCallLogger->Get());
 }
