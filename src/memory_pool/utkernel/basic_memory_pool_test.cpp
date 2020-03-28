@@ -13,7 +13,7 @@ namespace {
 char memory_area[512 + 1];
 }  // namespace
 
-class MemoryPoolTest : public ::testing::Test {
+class BasicMemoryPoolTest : public ::testing::Test {
  protected:
   MemoryPool mp;
 
@@ -32,7 +32,7 @@ class MemoryPoolTest : public ::testing::Test {
   }
 };
 
-TEST_F(MemoryPoolTest, New) {
+TEST_F(BasicMemoryPoolTest, New) {
   mp = basicMemoryPool->New(memory_area, sizeof(memory_area), 32);
 
   ASSERT_TRUE(mp != NULL);
@@ -46,7 +46,7 @@ TEST_F(MemoryPoolTest, New) {
       systemCallLogger->Get());
 }
 
-TEST_F(MemoryPoolTest, Delete) {
+TEST_F(BasicMemoryPoolTest, Delete) {
   NewBasicMemoryPool();
 
   memoryPool->Delete(&mp);
@@ -58,7 +58,7 @@ TEST_F(MemoryPoolTest, Delete) {
       systemCallLogger->Get());
 }
 
-TEST_F(MemoryPoolTest, Get) {
+TEST_F(BasicMemoryPoolTest, Get) {
   NewBasicMemoryPool();
 
   EXPECT_TRUE(memoryPool->Get(mp) != NULL);
@@ -69,7 +69,7 @@ TEST_F(MemoryPoolTest, Get) {
       systemCallLogger->Get());
 }
 
-TEST_F(MemoryPoolTest, GetWhenMemoryBlockAcquisitionFailed) {
+TEST_F(BasicMemoryPoolTest, GetWhenMemoryBlockAcquisitionFailed) {
   NewBasicMemoryPool();
   utkernelMpfSpy->SetReturnCode(0, -50);
 
@@ -80,7 +80,7 @@ TEST_F(MemoryPoolTest, GetWhenMemoryBlockAcquisitionFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(MemoryPoolTest, Release) {
+TEST_F(BasicMemoryPoolTest, Release) {
   NewBasicMemoryPool();
   void *block = memoryPool->Get(mp);
   systemCallLogger->Reset();
