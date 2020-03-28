@@ -2,8 +2,8 @@
 // This software is released under the MIT License, see LICENSE.
 #include "time_unit.h"
 
-#include "task.h"
 #include "uptime.h"
+#include "utkernel/utkernel.h"
 
 enum {
   kBaseTimeUnit = 1,
@@ -15,7 +15,7 @@ enum {
 
 static int64_t Now(Duration d) { return uptime->Get() / d; }
 
-static void Sleep(Duration d) {}
+static void Sleep(Duration d) { tk_dly_tsk(d); }
 
 static const TimeUnitMethodStruct kTheMethod = {
     .Millisecond = kMillisecond,
