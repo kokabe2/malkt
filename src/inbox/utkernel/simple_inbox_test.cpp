@@ -4,7 +4,7 @@
 
 extern "C" {
 #include "../../util/system_call_logger.h"
-#include "inbox.h"
+#include "simple_inbox.h"
 #include "utkernel_mbx_spy.h"
 #include "utkernel_mpl_spy.h"
 }
@@ -20,7 +20,7 @@ class InboxTest : public ::testing::Test {
   virtual void SetUp() {
     utkernelMbxSpy->Reset();
     utkernelMplSpy->Reset();
-    i = inbox->New(1024);
+    i = simpleInbox->New(1024);
     systemCallLogger->Reset();
   }
 
@@ -30,7 +30,7 @@ class InboxTest : public ::testing::Test {
 };
 
 TEST_F(InboxTest, New) {
-  Inbox instance = inbox->New(1024);
+  Inbox instance = simpleInbox->New(1024);
 
   EXPECT_TRUE(instance != NULL);
   EXPECT_EQ((TA_TFIFO | TA_MFIFO), utkernelMbxSpy->Attribute());
@@ -47,7 +47,7 @@ TEST_F(InboxTest, New) {
 }
 
 TEST_F(InboxTest, NewWithOutRangeOfCapacity) {
-  Inbox instance = inbox->New(kMaxInboxCapacity + 1);
+  Inbox instance = simpleInbox->New(kMaxInboxCapacity + 1);
 
   EXPECT_EQ(kMaxInboxCapacity, utkernelMplSpy->Capacity());
 

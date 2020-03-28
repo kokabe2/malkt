@@ -5,21 +5,16 @@
 
 #include <stdbool.h>
 
-enum {
-  kMaxInboxCapacity = 4 * 1024,
-};
-
 typedef struct InboxStruct* Inbox;
 typedef struct {
-  Inbox (*New)(int capacity);
   void (*Delete)(Inbox* self);
   bool (*Post)(Inbox self, const void* message, int size);
   bool (*BlockingPost)(Inbox self, const void* message, int size);
   void* (*Get)(Inbox self);
   void* (*BlockingGet)(Inbox self);
-} InboxMethodStruct;
-typedef const InboxMethodStruct* InboxMethod;
+} InboxInterfaceStruct;
+typedef const InboxInterfaceStruct* InboxInterface;
 
-extern const InboxMethod inbox;
+extern const InboxInterface inbox;
 
 #endif  // V1_INBOX_H_
