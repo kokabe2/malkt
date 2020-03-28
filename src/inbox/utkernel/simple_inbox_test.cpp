@@ -13,7 +13,7 @@ namespace {
 char kDummyMessage[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 }  // namespace
 
-class InboxTest : public ::testing::Test {
+class SimpleInboxTest : public ::testing::Test {
  protected:
   Inbox i;
 
@@ -33,7 +33,7 @@ class InboxTest : public ::testing::Test {
   }
 };
 
-TEST_F(InboxTest, New) {
+TEST_F(SimpleInboxTest, New) {
   i = simpleInbox->New(1024);
 
   EXPECT_TRUE(i != NULL);
@@ -48,13 +48,13 @@ TEST_F(InboxTest, New) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, NewWithOutRangeOfCapacity) {
+TEST_F(SimpleInboxTest, NewWithOutRangeOfCapacity) {
   i = simpleInbox->New(kMaxInboxCapacity + 1);
 
   EXPECT_EQ(kMaxInboxCapacity, utkernelMplSpy->Capacity());
 }
 
-TEST_F(InboxTest, Delete) {
+TEST_F(SimpleInboxTest, Delete) {
   NewSimpleInbox();
 
   inbox->Delete(&i);
@@ -68,7 +68,7 @@ TEST_F(InboxTest, Delete) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, Post) {
+TEST_F(SimpleInboxTest, Post) {
   NewSimpleInbox();
 
   EXPECT_TRUE(inbox->Post(i, kDummyMessage, sizeof(kDummyMessage)));
@@ -83,7 +83,7 @@ TEST_F(InboxTest, Post) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, PostWhenMemoryBlockAcquisitionFailed) {
+TEST_F(SimpleInboxTest, PostWhenMemoryBlockAcquisitionFailed) {
   NewSimpleInbox();
   utkernelMplSpy->SetReturnCode(0, -50);
 
@@ -94,7 +94,7 @@ TEST_F(InboxTest, PostWhenMemoryBlockAcquisitionFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, BlockingPost) {
+TEST_F(SimpleInboxTest, BlockingPost) {
   NewSimpleInbox();
 
   EXPECT_TRUE(inbox->BlockingPost(i, kDummyMessage, sizeof(kDummyMessage)));
@@ -109,7 +109,7 @@ TEST_F(InboxTest, BlockingPost) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, Get) {
+TEST_F(SimpleInboxTest, Get) {
   NewSimpleInbox();
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   systemCallLogger->Reset();
@@ -122,7 +122,7 @@ TEST_F(InboxTest, Get) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, GetWhenNoMessageOrSomethingFailed) {
+TEST_F(SimpleInboxTest, GetWhenNoMessageOrSomethingFailed) {
   NewSimpleInbox();
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   utkernelMbxSpy->SetReturnCode(0, -50);
@@ -135,7 +135,7 @@ TEST_F(InboxTest, GetWhenNoMessageOrSomethingFailed) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, GetAfterTheSecondTime) {
+TEST_F(SimpleInboxTest, GetAfterTheSecondTime) {
   NewSimpleInbox();
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   inbox->Get(i);
@@ -152,7 +152,7 @@ TEST_F(InboxTest, GetAfterTheSecondTime) {
       systemCallLogger->Get());
 }
 
-TEST_F(InboxTest, BlockingGet) {
+TEST_F(SimpleInboxTest, BlockingGet) {
   NewSimpleInbox();
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   systemCallLogger->Reset();
