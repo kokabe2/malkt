@@ -9,9 +9,9 @@ extern "C" {
 }
 
 namespace {
-bool was_ran;
+int timer_called_count;
 
-void TimerSpy(void) { was_ran = true; }
+void TimerSpy(void) { ++timer_called_count; }
 }  // namespace
 
 class OneShotTimerTest : public ::testing::Test {
@@ -19,21 +19,25 @@ class OneShotTimerTest : public ::testing::Test {
   Timer t;
 
   virtual void SetUp() {
-    was_ran = false;
+    timer_called_count = 0;
     utkernelCycSpy->Reset();
-    t = oneShotTimer->New(TimerSpy, 10);
     systemCallLogger->Reset();
   }
 
   virtual void TearDown() {
     if (t != NULL) timer->Delete(&t);
   }
+
+  void NewOneShotTimer() {
+    t = oneShotTimer->New(TimerSpy, 10);
+    systemCallLogger->Reset();
+  }
 };
 
 TEST_F(OneShotTimerTest, New) {
-  Timer instance = oneShotTimer->New(TimerSpy, 10);
+  t = oneShotTimer->New(TimerSpy, 10);
 
-  EXPECT_TRUE(instance != NULL);
+  EXPECT_TRUE(t != NULL);
   EXPECT_EQ((TA_HLNG | TA_STA | TA_PHS), utkernelCycSpy->Attribute());
   EXPECT_EQ(~0, utkernelCycSpy->CycleTime());
   EXPECT_EQ(10, utkernelCycSpy->CyclePhase());
@@ -42,14 +46,25 @@ TEST_F(OneShotTimerTest, New) {
       "- tk_cre_cyc (0)\n",
       systemCallLogger->Get());
 
-  EXPECT_FALSE(was_ran);
   utkernelCycSpy->RunTimer();
-  EXPECT_TRUE(was_ran);
+  EXPECT_EQ(1, timer_called_count);
+}
 
-  timer->Delete(&instance);
+TEST_F(OneShotTimerTest, Delete) {
+  NewOneShotTimer();
+
+  timer->Delete(&t);
+
+  EXPECT_EQ(NULL, t);
+  EXPECT_STREQ(
+      "+ tk_del_cyc (0)\n"
+      "- tk_del_cyc (0)\n",
+      systemCallLogger->Get());
 }
 
 TEST_F(OneShotTimerTest, ResumeWhenTimerIsNotDone) {
+  NewOneShotTimer();
+
   timer->Resume(t);
 
   EXPECT_STREQ(
@@ -59,6 +74,7 @@ TEST_F(OneShotTimerTest, ResumeWhenTimerIsNotDone) {
 }
 
 TEST_F(OneShotTimerTest, ResumeWhenTimerIsDone) {
+  NewOneShotTimer();
   utkernelCycSpy->RunTimer();
 
   timer->Resume(t);
@@ -67,16 +83,18 @@ TEST_F(OneShotTimerTest, ResumeWhenTimerIsDone) {
 }
 
 TEST_F(OneShotTimerTest, IsDone) {
+  NewOneShotTimer();
+
   EXPECT_FALSE(oneShotTimer->IsDone(t));
   utkernelCycSpy->RunTimer();
   EXPECT_TRUE(oneShotTimer->IsDone(t));
 }
 
 TEST_F(OneShotTimerTest, RunTimerOnlyOnce) {
-  utkernelCycSpy->RunTimer();
-  was_ran = false;
-
+  NewOneShotTimer();
   utkernelCycSpy->RunTimer();
 
-  EXPECT_FALSE(was_ran);
+  utkernelCycSpy->RunTimer();
+
+  EXPECT_EQ(1, timer_called_count);
 }
