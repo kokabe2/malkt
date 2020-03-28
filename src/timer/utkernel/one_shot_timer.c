@@ -9,7 +9,7 @@
 typedef struct {
   TimerStruct base;
   OneShotTimerDelegate Timer;
-  bool is_done;
+  bool done;
 } OneShotTimerStruct, *OneShotTimer;
 
 static void Delete(Timer* self) {
@@ -19,7 +19,7 @@ static void Delete(Timer* self) {
 
 static void Pause(Timer self) { tk_stp_cyc(self->id); }
 
-inline static bool IsDone(Timer self) { return ((OneShotTimer)self)->is_done; }
+inline static bool IsDone(Timer self) { return ((OneShotTimer)self)->done; }
 
 static void Resume(Timer self) {
   if (!IsDone(self)) tk_sta_cyc(self->id);
@@ -35,7 +35,7 @@ static void TimerEntry(void* exinf) {
   OneShotTimer self = (OneShotTimer)exinf;
   if (!IsDone((Timer)self)) {
     self->Timer();
-    self->is_done = true;
+    self->done = true;
   }
 }
 
