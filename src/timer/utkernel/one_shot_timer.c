@@ -31,8 +31,6 @@ static const TimerInterfaceStruct kTheInterface = {
     .Resume = Resume,
 };
 
-inline static void Done(OneShotTimer self) { self->is_done = true; }
-
 static void TimerEntry(void* exinf) {
   OneShotTimer self = (OneShotTimer)exinf;
   if (!IsDone((Timer)self)) {
