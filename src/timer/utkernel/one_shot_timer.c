@@ -2,47 +2,65 @@
 // This software is released under the MIT License, see LICENSE.
 #include "one_shot_timer.h"
 
+#include "../timer_private.h"
 #include "bleu/v1/heap.h"
-#include "timer_protected.h"
 #include "utkernel/utkernel.h"
 
 typedef struct {
   TimerStruct base;
+  OneShotTimerDelegate Timer;
   bool is_done;
 } OneShotTimerStruct, *OneShotTimer;
 
-inline static OneShotTimer Downcast(Timer self) { return (OneShotTimer)self; }
+static void Delete(Timer* self) {
+  tk_del_cyc((*self)->id);
+  heap->Delete((void**)self);
+}
 
-inline static bool IsDone(Timer self) { return Downcast(self)->is_done; }
+static void Pause(Timer self) { tk_stp_cyc(self->id); }
+
+inline static bool IsDone(Timer self) { return ((OneShotTimer)self)->is_done; }
 
 static void Resume(Timer self) {
   if (!IsDone(self)) tk_sta_cyc(self->id);
 }
 
-static const TimerAbstractMethodStruct kConcreteMethod = {
+static const TimerInterfaceStruct kTheInterface = {
+    .Delete = Delete,
+    .Pause = Pause,
     .Resume = Resume,
 };
 
-inline static void Done(Timer self) { Downcast(self)->is_done = true; }
+inline static void Done(OneShotTimer self) { self->is_done = true; }
 
 static void TimerEntry(void* exinf) {
-  Timer self = (Timer)exinf;
-  if (!IsDone(self)) {
-    self->timer();
-    Done(self);
+  OneShotTimer self = (OneShotTimer)exinf;
+  if (!IsDone((Timer)self)) {
+    self->Timer();
+    self->is_done = true;
   }
 }
 
-static Timer New(TimerDelegate timer, int milliseconds) {
-  Timer self = (Timer)heap->New(sizeof(OneShotTimerStruct));
-  self->timer = timer;
-  self->impl = &kConcreteMethod;
-  _timer->CreateTimer(self, milliseconds, ~0, TimerEntry);
-  return self;
+static void CreateTimer(OneShotTimer self, int milliseconds) {
+  T_CCYC packet = {.exinf = self,
+                   .cycatr = TA_HLNG | TA_STA | TA_PHS,
+                   .cychdr = (FP)TimerEntry,
+                   .cyctim = (RELTIM)~0,
+                   .cycphs = (RELTIM)milliseconds};
+  self->base.id = tk_cre_cyc(&packet);
+}
+
+static Timer New(OneShotTimerDelegate timer, int milliseconds) {
+  OneShotTimer self = (OneShotTimer)heap->New(sizeof(OneShotTimerStruct));
+  self->base.impl = &kTheInterface;
+  self->Timer = timer;
+  CreateTimer(self, milliseconds);
+  return (Timer)self;
 }
 
 static const OneShotTimerMethodStruct kTheMethod = {
-    .New = New, .IsDone = IsDone,
+    .New = New,
+    .IsDone = IsDone,
 };
 
 const OneShotTimerMethod oneShotTimer = &kTheMethod;

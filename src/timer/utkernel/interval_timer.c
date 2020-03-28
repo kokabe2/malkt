@@ -2,27 +2,50 @@
 // This software is released under the MIT License, see LICENSE.
 #include "interval_timer.h"
 
+#include "../timer_private.h"
 #include "bleu/v1/heap.h"
-#include "timer_protected.h"
 #include "utkernel/utkernel.h"
+
+typedef struct {
+  TimerStruct base;
+  IntervalTimerDelegate Timer;
+} IntervalTimerStruct, *IntervalTimer;
+
+static void Delete(Timer* self) {
+  tk_del_cyc((*self)->id);
+  heap->Delete((void**)self);
+}
+
+static void Pause(Timer self) { tk_stp_cyc(self->id); }
 
 static void Resume(Timer self) { tk_sta_cyc(self->id); }
 
-static const TimerAbstractMethodStruct kConcreteMethod = {
+static const TimerInterfaceStruct kTheInterface = {
+    .Delete = Delete,
+    .Pause = Pause,
     .Resume = Resume,
 };
 
 static void TimerEntry(void* exinf) {
-  Timer self = (Timer)exinf;
-  self->timer();
+  IntervalTimer self = (IntervalTimer)exinf;
+  self->Timer();
 }
 
-static Timer New(TimerDelegate timer, int milliseconds) {
-  Timer self = (Timer)heap->New(sizeof(TimerStruct));
-  self->timer = timer;
-  self->impl = &kConcreteMethod;
-  _timer->CreateTimer(self, milliseconds, milliseconds, TimerEntry);
-  return self;
+static void CreateTimer(IntervalTimer self, int milliseconds) {
+  T_CCYC packet = {.exinf = self,
+                   .cycatr = TA_HLNG | TA_STA | TA_PHS,
+                   .cychdr = (FP)TimerEntry,
+                   .cyctim = (RELTIM)milliseconds,
+                   .cycphs = (RELTIM)milliseconds};
+  self->base.id = tk_cre_cyc(&packet);
+}
+
+static Timer New(IntervalTimerDelegate timer, int milliseconds) {
+  IntervalTimer self = (IntervalTimer)heap->New(sizeof(IntervalTimerStruct));
+  self->base.impl = &kTheInterface;
+  self->Timer = timer;
+  CreateTimer(self, milliseconds);
+  return (Timer)self;
 }
 
 static const IntervalTimerMethodStruct kTheMethod = {
