@@ -20,19 +20,23 @@ class InboxTest : public ::testing::Test {
   virtual void SetUp() {
     utkernelMbxSpy->Reset();
     utkernelMplSpy->Reset();
-    i = simpleInbox->New(1024);
     systemCallLogger->Reset();
   }
 
   virtual void TearDown() {
     if (i != NULL) inbox->Delete(&i);
   }
+
+  void NewSimpleInbox() {
+    i = simpleInbox->New(1024);
+    systemCallLogger->Reset();
+  }
 };
 
 TEST_F(InboxTest, New) {
-  Inbox instance = simpleInbox->New(1024);
+  i = simpleInbox->New(1024);
 
-  EXPECT_TRUE(instance != NULL);
+  EXPECT_TRUE(i != NULL);
   EXPECT_EQ((TA_TFIFO | TA_MFIFO), utkernelMbxSpy->Attribute());
   EXPECT_EQ((TA_TFIFO | TA_RNG0), utkernelMplSpy->Attribute());
   EXPECT_EQ(1024, utkernelMplSpy->Capacity());
@@ -42,19 +46,17 @@ TEST_F(InboxTest, New) {
       "+ tk_cre_mpl\n"
       "- tk_cre_mpl (0)\n",
       systemCallLogger->Get());
-
-  inbox->Delete(&instance);
 }
 
 TEST_F(InboxTest, NewWithOutRangeOfCapacity) {
-  Inbox instance = simpleInbox->New(kMaxInboxCapacity + 1);
+  i = simpleInbox->New(kMaxInboxCapacity + 1);
 
   EXPECT_EQ(kMaxInboxCapacity, utkernelMplSpy->Capacity());
-
-  inbox->Delete(&instance);
 }
 
 TEST_F(InboxTest, Delete) {
+  NewSimpleInbox();
+
   inbox->Delete(&i);
 
   EXPECT_EQ(NULL, i);
@@ -67,6 +69,8 @@ TEST_F(InboxTest, Delete) {
 }
 
 TEST_F(InboxTest, Post) {
+  NewSimpleInbox();
+
   EXPECT_TRUE(inbox->Post(i, kDummyMessage, sizeof(kDummyMessage)));
   EXPECT_EQ(0, memcmp(kDummyMessage, utkernelMbxSpy->LastMessage(), sizeof(kDummyMessage)));
   EXPECT_EQ(sizeof(T_MSG) + sizeof(kDummyMessage), utkernelMplSpy->BlockSize());
@@ -80,6 +84,7 @@ TEST_F(InboxTest, Post) {
 }
 
 TEST_F(InboxTest, PostWhenMemoryBlockAcquisitionFailed) {
+  NewSimpleInbox();
   utkernelMplSpy->SetReturnCode(0, -50);
 
   EXPECT_FALSE(inbox->Post(i, kDummyMessage, sizeof(kDummyMessage)));
@@ -90,6 +95,8 @@ TEST_F(InboxTest, PostWhenMemoryBlockAcquisitionFailed) {
 }
 
 TEST_F(InboxTest, BlockingPost) {
+  NewSimpleInbox();
+
   EXPECT_TRUE(inbox->BlockingPost(i, kDummyMessage, sizeof(kDummyMessage)));
   EXPECT_EQ(0, memcmp(kDummyMessage, utkernelMbxSpy->LastMessage(), sizeof(kDummyMessage)));
   EXPECT_EQ(sizeof(T_MSG) + sizeof(kDummyMessage), utkernelMplSpy->BlockSize());
@@ -103,6 +110,7 @@ TEST_F(InboxTest, BlockingPost) {
 }
 
 TEST_F(InboxTest, Get) {
+  NewSimpleInbox();
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   systemCallLogger->Reset();
 
@@ -115,6 +123,7 @@ TEST_F(InboxTest, Get) {
 }
 
 TEST_F(InboxTest, GetWhenNoMessageOrSomethingFailed) {
+  NewSimpleInbox();
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   utkernelMbxSpy->SetReturnCode(0, -50);
   systemCallLogger->Reset();
@@ -127,6 +136,7 @@ TEST_F(InboxTest, GetWhenNoMessageOrSomethingFailed) {
 }
 
 TEST_F(InboxTest, GetAfterTheSecondTime) {
+  NewSimpleInbox();
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   inbox->Get(i);
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
@@ -143,6 +153,7 @@ TEST_F(InboxTest, GetAfterTheSecondTime) {
 }
 
 TEST_F(InboxTest, BlockingGet) {
+  NewSimpleInbox();
   inbox->Post(i, kDummyMessage, sizeof(kDummyMessage));
   systemCallLogger->Reset();
 
