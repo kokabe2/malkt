@@ -30,7 +30,6 @@ add_executable(
     isr/utkernel/utkernel_int_spy.c
     memory_pool/utkernel/memory_pool_test.cpp
     memory_pool/utkernel/utkernel_mpf_spy.c
-    task/utkernel/function_entry_spy.c
     task/utkernel/utkernel_tsk_spy.c
     task/utkernel/task_test.cpp
     time/utkernel/time_unit_test.cpp
