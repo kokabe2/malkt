@@ -11,7 +11,8 @@ mkdir %OUTPUT_DIR% > NUL 2>&1
 %COMPILER% -output=obj -lang=c99 -nostuff -isa=rxv3 -debug -signed_char ^
            -include=v1/,external/ ^
            src/inbox/utkernel/inbox.c ^
-           src/isr/utkernel/isr.c ^
+           src/isr/utkernel/basic_isr.c ^
+           src/isr/isr.c ^
            src/memory_pool/utkernel/memory_pool.c ^
            src/task/utkernel/task.c ^
            src/time/utkernel/time_unit.c ^

@@ -3,16 +3,14 @@
 #ifndef V1_ISR_H_
 #define V1_ISR_H_
 
-typedef void (*InterruptDelegate)(int interrupt_number);
 typedef struct IsrStruct* Isr;
 typedef struct {
-  Isr (*New)(int interrupt_number, InterruptDelegate interrupt);
   void (*Delete)(Isr* self);
-  void (*Enable)(Isr self, int level);
+  void (*Enable)(Isr self);
   void (*Disable)(Isr self);
-} IsrMethodStruct;
-typedef const IsrMethodStruct* IsrMethod;
+} IsrInterfaceStruct;
+typedef const IsrInterfaceStruct* IsrInterface;
 
-extern const IsrMethod isr;
+extern const IsrInterface isr;
 
 #endif  // V1_ISR_H_
