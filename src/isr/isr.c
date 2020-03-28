@@ -10,10 +10,10 @@ static void Enable(Isr self) { self->impl->Enable(self); }
 
 static void Disable(Isr self) { self->impl->Disable(self); }
 
-static const IsrInterfaceStruct kTheMethod = {
+static const IsrInterfaceStruct kTheInterface = {
     .Delete = Delete,
     .Enable = Enable,
     .Disable = Disable,
 };
 
-const IsrInterface isr = &kTheMethod;
+const IsrInterface isr = &kTheInterface;

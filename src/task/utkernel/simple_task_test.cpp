@@ -67,7 +67,7 @@ TEST_F(TaskTest, NewWithOutOfRangePriority) {
 }
 
 TEST_F(TaskTest, NewWithOutOfRangeStackSize) {
-  Task t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize + 1);
+  t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize + 1);
 
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
 }
