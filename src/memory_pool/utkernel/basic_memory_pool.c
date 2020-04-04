@@ -5,29 +5,31 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "../memory_pool_private.h"
 #include "bleu/v1/heap.h"
 #include "utkernel/utkernel.h"
 
+typedef struct {
+  MemoryPoolInterfaceStruct impl;
+  int id;
+} BasiceMemoryPoolStruct, *BasiceMemoryPool;
+
 static void Delete(MemoryPool* self) {
-  tk_del_mpf((*self)->id);
+  tk_del_mpf(((BasiceMemoryPool)(*self))->id);
   heap->Delete((void**)self);
 }
 
 static void* Get(MemoryPool self) {
   void* block;
-  return tk_get_mpf(self->id, &block, TMO_POL) == E_OK ? block : NULL;
+  return tk_get_mpf(((BasiceMemoryPool)self)->id, &block, TMO_POL) == E_OK ? block : NULL;
 }
 
-static void Release(MemoryPool self, void* block) { tk_rel_mpf(self->id, block); }
+static void Release(MemoryPool self, void* block) { tk_rel_mpf(((BasiceMemoryPool)self)->id, block); }
 
 static const MemoryPoolInterfaceStruct kTheInterface = {
-    .Delete = Delete,
-    .Get = Get,
-    .Release = Release,
+    .Delete = Delete, .Get = Get, .Release = Release,
 };
 
-inline static void CreateMemoryPool(MemoryPool self, void* memory_area, int capacity, int block_size) {
+inline static void CreateMemoryPool(BasiceMemoryPool self, void* memory_area, int capacity, int block_size) {
   T_CMPF packet = {.mpfatr = TA_TFIFO | TA_RNG0 | TA_USERBUF,
                    .mpfcnt = capacity / block_size,
                    .blfsz = block_size,
@@ -36,10 +38,10 @@ inline static void CreateMemoryPool(MemoryPool self, void* memory_area, int capa
 }
 
 static MemoryPool New(void* memory_area, int capacity, int block_size) {
-  MemoryPool self = (MemoryPool)heap->New(sizeof(MemoryPoolStruct));
-  self->impl = &kTheInterface;
+  BasiceMemoryPool self = (BasiceMemoryPool)heap->New(sizeof(BasiceMemoryPoolStruct));
+  self->impl = kTheInterface;
   CreateMemoryPool(self, memory_area, capacity, block_size);
-  return self;
+  return (MemoryPool)self;
 }
 
 static const BasicMemoryPoolMethodStruct kTheMethod = {
