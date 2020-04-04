@@ -5,76 +5,112 @@ skinparam {
     monochrome true
 }
 
-package Bleu {
-    folder heap {
-        class Heap {
-            + {static} New(int): void*
-            + {static} Delete(void**)
-        }
-    }
-}
 package Malkt {
     folder uptime {
         class Uptime {
-            + Get(): uint64_t
+            + {static} Get(): int64_t
+            + {static} Set(int64_t)
         }
     }
+
+    folder time {
+        class TimeUnit {
+            + {static} Millisecond: Duration
+            + {static} Second: Duration
+            + {static} Minute: Duration
+            + {static} Hour: Duration
+            + {static} Now(): int64_t
+            + {static} Sleep(Duration)
+        }
+    }
+
     folder task {
-        class Task {
-            + New(ActionDelegate, int, int): Task
+        interface Task {
             + Delete(Task*)
             + Run(Task)
             + Suspend(Task)
             + Resume(Task)
-            + Delay(int)
         }
+
+        class SimpleTask {
+            + New(ActionDelegate, int, int): Task
+        }
+
+        class ObjectizableTask {
+            + New(ActionDelegate, int, int, void*): Task
+        }
+
+        Task <|-- SimpleTask
+        Task <|-- ObjectizableTask
     }
+
     folder timer {
-        abstract Timer {
-            # CreateTimer(Timer, int, int, void (*)(void*)): bool
+        interface Timer {
             + Delete(Timer*)
             + Pause(Timer)
             + Resume(Timer)
         }
+
         class IntervalTimer {
             + New(TimerDelegate, int): Timer
         }
+
         class OneShotTimer {
             + New(TimerDelegate, int): Timer
         }
+
+        Timer <|-- IntervalTimer
+        Timer <|-- OneShotTimer
     }
+
     folder inbox {
-        class Inbox {
-            + New(int): Inbox
+        interface Inbox {
             + Delete(Inbox*)
             + Post(Inbox, const void*, int): bool
             + BlockingPost(Inbox, const void*, int): bool
             + Get(Inbox): void*
             + BlockingGet(Inbox): void*
         }
+
+        class SimpleInbox {
+            + New(int): Inbox
+        }
+
+        Inbox <|-- SimpleInbox
     }
+
     folder memory_pool {
-        class MemoryPool {
-            + New(void*, int, int): MemoryPool
+        interface MemoryPool {
             + Delete(MemoryPool*)
             + Get(MemoryPool): void*
             + Release(MemoryPool, void*)
         }
+
+        class BasicMemoryPool {
+            + New(void*, int, int): MemoryPool
+        }
+
+        MemoryPool <|-- BasicMemoryPool
     }
+
     folder isr {
-        class Isr {
-            + New(int, InterruptDelegate): Isr
+        interface Isr {
             + Delete(Isr*)
-            + Enable(Isr, int)
+            + Enable(Isr)
             + Disable(Isr)
         }
+
+        class BasicIsr {
+            + New(int, int, InterruptDelegate): Isr
+        }
+
+        Isr <|-- BasicIsr
     }
+
+    Uptime -[hidden]u-> IntervalTimer
+    TimeUnit -[hidden]u-> SimpleInbox
+    Isr -[hidden]u-> SimpleTask
+    MemoryPool -[hidden]u-> SimpleTask
 }
-Heap <-- Task
-Heap <-- Timer
-Timer <|-- IntervalTimer
-Timer <|-- OneShotTimer
-Heap <-- Inbox
-Heap <-- MemoryPool
-Heap <-- Isr
+
 @enduml
