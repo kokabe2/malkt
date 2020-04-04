@@ -3,8 +3,8 @@
 #ifndef V1_TIMER_H_
 #define V1_TIMER_H_
 
-typedef struct TimerStruct* Timer;
-typedef struct {
+typedef struct TimerInterfaceStruct* Timer;
+typedef struct TimerInterfaceStruct {
   void (*Delete)(Timer* self);
   void (*Pause)(Timer self);
   void (*Resume)(Timer self);

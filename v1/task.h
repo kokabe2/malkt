@@ -3,8 +3,8 @@
 #ifndef V1_TASK_H_
 #define V1_TASK_H_
 
-typedef struct TaskStruct* Task;
-typedef struct {
+typedef struct TaskInterfaceStruct* Task;
+typedef struct TaskInterfaceStruct {
   void (*Delete)(Task* self);
   void (*Run)(Task self);
   void (*Suspend)(Task self);
