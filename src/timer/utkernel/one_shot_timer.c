@@ -2,33 +2,31 @@
 // This software is released under the MIT License, see LICENSE.
 #include "one_shot_timer.h"
 
-#include "../timer_private.h"
 #include "bleu/v1/heap.h"
 #include "utkernel/utkernel.h"
 
 typedef struct {
-  TimerStruct base;
+  TimerInterfaceStruct impl;
+  int id;
   OneShotTimerDelegate Timer;
   bool done;
 } OneShotTimerStruct, *OneShotTimer;
 
 static void Delete(Timer* self) {
-  tk_del_cyc((*self)->id);
+  tk_del_cyc(((OneShotTimer)(*self))->id);
   heap->Delete((void**)self);
 }
 
-static void Pause(Timer self) { tk_stp_cyc(self->id); }
+static void Pause(Timer self) { tk_stp_cyc(((OneShotTimer)self)->id); }
 
 inline static bool IsDone(Timer self) { return ((OneShotTimer)self)->done; }
 
 static void Resume(Timer self) {
-  if (!IsDone(self)) tk_sta_cyc(self->id);
+  if (!IsDone(self)) tk_sta_cyc(((OneShotTimer)self)->id);
 }
 
 static const TimerInterfaceStruct kTheInterface = {
-    .Delete = Delete,
-    .Pause = Pause,
-    .Resume = Resume,
+    .Delete = Delete, .Pause = Pause, .Resume = Resume,
 };
 
 static void TimerEntry(void* exinf) {
@@ -45,20 +43,19 @@ static void CreateTimer(OneShotTimer self, int milliseconds) {
                    .cychdr = (FP)TimerEntry,
                    .cyctim = (RELTIM)~0,
                    .cycphs = (RELTIM)milliseconds};
-  self->base.id = tk_cre_cyc(&packet);
+  self->id = tk_cre_cyc(&packet);
 }
 
 static Timer New(OneShotTimerDelegate timer, int milliseconds) {
   OneShotTimer self = (OneShotTimer)heap->New(sizeof(OneShotTimerStruct));
-  self->base.impl = &kTheInterface;
+  self->impl = kTheInterface;
   self->Timer = timer;
   CreateTimer(self, milliseconds);
   return (Timer)self;
 }
 
 static const OneShotTimerMethodStruct kTheMethod = {
-    .New = New,
-    .IsDone = IsDone,
+    .New = New, .IsDone = IsDone,
 };
 
 const OneShotTimerMethod oneShotTimer = &kTheMethod;

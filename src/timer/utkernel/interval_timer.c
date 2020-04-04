@@ -2,28 +2,26 @@
 // This software is released under the MIT License, see LICENSE.
 #include "interval_timer.h"
 
-#include "../timer_private.h"
 #include "bleu/v1/heap.h"
 #include "utkernel/utkernel.h"
 
 typedef struct {
-  TimerStruct base;
+  TimerInterfaceStruct impl;
+  int id;
   IntervalTimerDelegate Timer;
 } IntervalTimerStruct, *IntervalTimer;
 
 static void Delete(Timer* self) {
-  tk_del_cyc((*self)->id);
+  tk_del_cyc(((IntervalTimer)(*self))->id);
   heap->Delete((void**)self);
 }
 
-static void Pause(Timer self) { tk_stp_cyc(self->id); }
+static void Pause(Timer self) { tk_stp_cyc(((IntervalTimer)self)->id); }
 
-static void Resume(Timer self) { tk_sta_cyc(self->id); }
+static void Resume(Timer self) { tk_sta_cyc(((IntervalTimer)self)->id); }
 
 static const TimerInterfaceStruct kTheInterface = {
-    .Delete = Delete,
-    .Pause = Pause,
-    .Resume = Resume,
+    .Delete = Delete, .Pause = Pause, .Resume = Resume,
 };
 
 static void TimerEntry(void* exinf) {
@@ -37,12 +35,12 @@ static void CreateTimer(IntervalTimer self, int milliseconds) {
                    .cychdr = (FP)TimerEntry,
                    .cyctim = (RELTIM)milliseconds,
                    .cycphs = (RELTIM)milliseconds};
-  self->base.id = tk_cre_cyc(&packet);
+  self->id = tk_cre_cyc(&packet);
 }
 
 static Timer New(IntervalTimerDelegate timer, int milliseconds) {
   IntervalTimer self = (IntervalTimer)heap->New(sizeof(IntervalTimerStruct));
-  self->base.impl = &kTheInterface;
+  self->impl = kTheInterface;
   self->Timer = timer;
   CreateTimer(self, milliseconds);
   return (Timer)self;
