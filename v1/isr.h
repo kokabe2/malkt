@@ -3,8 +3,8 @@
 #ifndef V1_ISR_H_
 #define V1_ISR_H_
 
-typedef struct IsrStruct* Isr;
-typedef struct {
+typedef struct IsrInterfaceStruct* Isr;
+typedef struct IsrInterfaceStruct {
   void (*Delete)(Isr* self);
   void (*Enable)(Isr self);
   void (*Disable)(Isr self);
