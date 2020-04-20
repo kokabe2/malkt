@@ -15,7 +15,6 @@ add_library(
     time/utkernel/time_unit.c
     timer/utkernel/interval_timer.c
     timer/utkernel/one_shot_timer.c
-    timer/timer.c
     uptime/utkernel/uptime.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/heap_usage.c

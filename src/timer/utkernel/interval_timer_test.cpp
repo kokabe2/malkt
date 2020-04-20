@@ -3,8 +3,8 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "../../util/system_call_logger.h"
 #include "interval_timer.h"
+#include "util/system_call_logger.h"
 #include "utkernel_cyc_spy.h"
 }
 
@@ -16,7 +16,7 @@ void TimerSpy(void) { was_ran = true; }
 
 class IntervalTimerTest : public ::testing::Test {
  protected:
-  Timer t;
+  Timer timer;
 
   virtual void SetUp() {
     was_ran = false;
@@ -25,19 +25,19 @@ class IntervalTimerTest : public ::testing::Test {
   }
 
   virtual void TearDown() {
-    if (t != NULL) timer->Delete(&t);
+    if (timer != NULL) timer->Delete(&timer);
   }
 
   void NewIntervalTimer() {
-    t = intervalTimer->New(TimerSpy, 10);
+    timer = intervalTimer->New(TimerSpy, 10);
     systemCallLogger->Reset();
   }
 };
 
 TEST_F(IntervalTimerTest, New) {
-  t = intervalTimer->New(TimerSpy, 10);
+  timer = intervalTimer->New(TimerSpy, 10);
 
-  EXPECT_TRUE(t != NULL);
+  EXPECT_TRUE(timer != NULL);
   EXPECT_EQ((TA_HLNG | TA_STA | TA_PHS), utkernelCycSpy->Attribute());
   EXPECT_EQ(10, utkernelCycSpy->CycleTime());
   EXPECT_EQ(10, utkernelCycSpy->CyclePhase());
@@ -54,9 +54,9 @@ TEST_F(IntervalTimerTest, New) {
 TEST_F(IntervalTimerTest, Delete) {
   NewIntervalTimer();
 
-  timer->Delete(&t);
+  timer->Delete(&timer);
 
-  EXPECT_EQ(NULL, t);
+  EXPECT_EQ(NULL, timer);
   EXPECT_STREQ(
       "+ tk_del_cyc (0)\n"
       "- tk_del_cyc (0)\n",
@@ -66,7 +66,7 @@ TEST_F(IntervalTimerTest, Delete) {
 TEST_F(IntervalTimerTest, Pause) {
   NewIntervalTimer();
 
-  timer->Pause(t);
+  timer->Pause(timer);
 
   EXPECT_STREQ(
       "+ tk_stp_cyc (0)\n"
@@ -77,7 +77,7 @@ TEST_F(IntervalTimerTest, Pause) {
 TEST_F(IntervalTimerTest, Resume) {
   NewIntervalTimer();
 
-  timer->Resume(t);
+  timer->Resume(timer);
 
   EXPECT_STREQ(
       "+ tk_sta_cyc (0)\n"
