@@ -10,8 +10,5 @@ typedef struct TaskInterfaceStruct {
   void (*Suspend)(Task self);
   void (*Resume)(Task self);
 } TaskInterfaceStruct;
-typedef const TaskInterfaceStruct* TaskInterface;
-
-extern const TaskInterface task;
 
 #endif  // V1_TASK_H_

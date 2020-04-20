@@ -9,8 +9,5 @@ typedef struct TimerInterfaceStruct {
   void (*Pause)(Timer self);
   void (*Resume)(Timer self);
 } TimerInterfaceStruct;
-typedef const TimerInterfaceStruct* TimerInterface;
-
-extern const TimerInterface timer;
 
 #endif  // V1_TIMER_H_

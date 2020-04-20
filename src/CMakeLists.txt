@@ -1,5 +1,6 @@
 include_directories(
     ${PROJECT_SOURCE_DIR}/v1
+    ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/external
     ${PROJECT_SOURCE_DIR}/external/bleu/v1
     )
@@ -7,18 +8,13 @@ include_directories(
 add_library(
     malkt
     inbox/utkernel/simple_inbox.c
-    inbox/inbox.c
     isr/utkernel/basic_isr.c
-    isr/isr.c
     memory_pool/utkernel/basic_memory_pool.c
-    memory_pool/memory_pool.c
     task/utkernel/objectizable_task.c
     task/utkernel/simple_task.c
-    task/task.c
     time/utkernel/time_unit.c
     timer/utkernel/interval_timer.c
     timer/utkernel/one_shot_timer.c
-    timer/timer.c
     uptime/utkernel/uptime.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/gcc/heap.c
     ${PROJECT_SOURCE_DIR}/external/bleu/src/heap/heap_usage.c

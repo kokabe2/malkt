@@ -9,8 +9,5 @@ typedef struct IsrInterfaceStruct {
   void (*Enable)(Isr self);
   void (*Disable)(Isr self);
 } IsrInterfaceStruct;
-typedef const IsrInterfaceStruct* IsrInterface;
-
-extern const IsrInterface isr;
 
 #endif  // V1_ISR_H_
