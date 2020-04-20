@@ -3,6 +3,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/external
     ${PROJECT_SOURCE_DIR}/external/bleu/v1
+    ${PROJECT_SOURCE_DIR}/external/bleu/src
     )
 
 add_library(
