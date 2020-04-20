@@ -12,7 +12,6 @@ add_library(
     memory_pool/utkernel/basic_memory_pool.c
     task/utkernel/objectizable_task.c
     task/utkernel/simple_task.c
-    task/task.c
     time/utkernel/time_unit.c
     timer/utkernel/interval_timer.c
     timer/utkernel/one_shot_timer.c

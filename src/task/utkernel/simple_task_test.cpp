@@ -3,8 +3,8 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "../../util/system_call_logger.h"
 #include "simple_task.h"
+#include "util/system_call_logger.h"
 #include "utkernel_tsk_spy.h"
 }
 
@@ -16,7 +16,7 @@ void DummyAction(void) { was_ran = true; }
 
 class SimpleTaskTest : public ::testing::Test {
  protected:
-  Task t;
+  Task task;
 
   virtual void SetUp() {
     was_ran = false;
@@ -25,19 +25,19 @@ class SimpleTaskTest : public ::testing::Test {
   }
 
   virtual void TearDown() {
-    if (t != NULL) task->Delete(&t);
+    if (task != NULL) task->Delete(&task);
   }
 
   void NewSimpleTask() {
-    t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
+    task = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
     systemCallLogger->Reset();
   }
 };
 
 TEST_F(SimpleTaskTest, New) {
-  t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
+  task = simpleTask->New(DummyAction, 4, kMaxTaskStackSize);
 
-  ASSERT_TRUE(t != NULL);
+  ASSERT_TRUE(task != NULL);
   EXPECT_EQ(TA_HLNG | TA_RNG0, utkernelTskSpy->Attribute());
   EXPECT_EQ(9, utkernelTskSpy->Priority());
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
@@ -49,25 +49,25 @@ TEST_F(SimpleTaskTest, New) {
 }
 
 TEST_F(SimpleTaskTest, NewWithBoundaryPriority) {
-  t = simpleTask->New(DummyAction, kHighestTaskPriority, kMaxTaskStackSize);
+  task = simpleTask->New(DummyAction, kHighestTaskPriority, kMaxTaskStackSize);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
-  task->Delete(&t);
+  task->Delete(&task);
 
-  t = simpleTask->New(DummyAction, kLowestTaskPriority, kMaxTaskStackSize);
+  task = simpleTask->New(DummyAction, kLowestTaskPriority, kMaxTaskStackSize);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
 }
 
 TEST_F(SimpleTaskTest, NewWithOutOfRangePriority) {
-  t = simpleTask->New(DummyAction, kHighestTaskPriority + 1, kMaxTaskStackSize);
+  task = simpleTask->New(DummyAction, kHighestTaskPriority + 1, kMaxTaskStackSize);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
-  task->Delete(&t);
+  task->Delete(&task);
 
-  t = simpleTask->New(DummyAction, kLowestTaskPriority - 1, kMaxTaskStackSize);
+  task = simpleTask->New(DummyAction, kLowestTaskPriority - 1, kMaxTaskStackSize);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
 }
 
 TEST_F(SimpleTaskTest, NewWithOutOfRangeStackSize) {
-  t = simpleTask->New(DummyAction, 4, kMaxTaskStackSize + 1);
+  task = simpleTask->New(DummyAction, 4, kMaxTaskStackSize + 1);
 
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
 }
@@ -75,9 +75,9 @@ TEST_F(SimpleTaskTest, NewWithOutOfRangeStackSize) {
 TEST_F(SimpleTaskTest, DeleteSelfTask) {
   NewSimpleTask();
 
-  task->Delete(&t);
+  task->Delete(&task);
 
-  EXPECT_EQ(NULL, t);
+  EXPECT_EQ(NULL, task);
   EXPECT_STREQ(
       "+ tk_get_tid\n"
       "- tk_get_tid (0)\n"
@@ -90,9 +90,9 @@ TEST_F(SimpleTaskTest, DeleteOtherTask) {
   NewSimpleTask();
   utkernelTskSpy->SetReturnCode(0, 1);
 
-  task->Delete(&t);
+  task->Delete(&task);
 
-  EXPECT_EQ(NULL, t);
+  EXPECT_EQ(NULL, task);
   EXPECT_STREQ(
       "+ tk_get_tid\n"
       "- tk_get_tid (1)\n"
@@ -106,7 +106,7 @@ TEST_F(SimpleTaskTest, DeleteOtherTask) {
 TEST_F(SimpleTaskTest, Run) {
   NewSimpleTask();
 
-  task->Run(t);
+  task->Run(task);
 
   EXPECT_TRUE(was_ran);
   EXPECT_STREQ(
@@ -120,7 +120,7 @@ TEST_F(SimpleTaskTest, Run) {
 TEST_F(SimpleTaskTest, SuspendSelfTask) {
   NewSimpleTask();
 
-  task->Suspend(t);
+  task->Suspend(task);
 
   EXPECT_EQ(TMO_FEVR, utkernelTskSpy->Timeout());
   EXPECT_STREQ(
@@ -135,7 +135,7 @@ TEST_F(SimpleTaskTest, SuspendOtherTask) {
   NewSimpleTask();
   utkernelTskSpy->SetReturnCode(0, 1);
 
-  task->Suspend(t);
+  task->Suspend(task);
 
   EXPECT_STREQ(
       "+ tk_get_tid\n"
@@ -150,9 +150,9 @@ TEST_F(SimpleTaskTest, SuspendOtherTask) {
 TEST_F(SimpleTaskTest, SuspendMultipleTimes) {
   NewSimpleTask();
 
-  task->Suspend(t);
-  task->Suspend(t);
-  task->Suspend(t);
+  task->Suspend(task);
+  task->Suspend(task);
+  task->Suspend(task);
 
   EXPECT_STREQ(
       "+ tk_get_tid\n"
@@ -164,10 +164,10 @@ TEST_F(SimpleTaskTest, SuspendMultipleTimes) {
 
 TEST_F(SimpleTaskTest, ResumeTaskSuspendedByMyself) {
   NewSimpleTask();
-  task->Suspend(t);
+  task->Suspend(task);
   systemCallLogger->Reset();
 
-  task->Resume(t);
+  task->Resume(task);
 
   EXPECT_STREQ(
       "+ tk_wup_tsk (0)\n"
@@ -178,10 +178,10 @@ TEST_F(SimpleTaskTest, ResumeTaskSuspendedByMyself) {
 TEST_F(SimpleTaskTest, ResumeTaskSuspendedByOther) {
   NewSimpleTask();
   utkernelTskSpy->SetReturnCode(0, 1);
-  task->Suspend(t);
+  task->Suspend(task);
   systemCallLogger->Reset();
 
-  task->Resume(t);
+  task->Resume(task);
 
   EXPECT_STREQ(
       "+ tk_rsm_tsk (0)\n"
@@ -192,19 +192,19 @@ TEST_F(SimpleTaskTest, ResumeTaskSuspendedByOther) {
 TEST_F(SimpleTaskTest, ResumeTaskNotSuspended) {
   NewSimpleTask();
 
-  task->Resume(t);
+  task->Resume(task);
 
   EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(SimpleTaskTest, ResumeMultipleTimes) {
   NewSimpleTask();
-  task->Suspend(t);
+  task->Suspend(task);
   systemCallLogger->Reset();
 
-  task->Resume(t);
-  task->Resume(t);
-  task->Resume(t);
+  task->Resume(task);
+  task->Resume(task);
+  task->Resume(task);
 
   EXPECT_STREQ(
       "+ tk_wup_tsk (0)\n"

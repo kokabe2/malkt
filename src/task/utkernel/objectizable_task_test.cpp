@@ -3,8 +3,8 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "../../util/system_call_logger.h"
 #include "objectizable_task.h"
+#include "util/system_call_logger.h"
 #include "utkernel_tsk_spy.h"
 }
 
@@ -20,7 +20,7 @@ void DummyAction(void *object) {
 
 class ObjectizableTaskTest : public ::testing::Test {
  protected:
-  Task t;
+  Task task;
   void *dummy_object;
 
   virtual void SetUp() {
@@ -31,19 +31,19 @@ class ObjectizableTaskTest : public ::testing::Test {
   }
 
   virtual void TearDown() {
-    if (t != NULL) task->Delete(&t);
+    if (task != NULL) task->Delete(&task);
   }
 
   void NewObjectizableTask() {
-    t = objectizableTask->New(DummyAction, 4, kMaxTaskStackSize, dummy_object);
+    task = objectizableTask->New(DummyAction, 4, kMaxTaskStackSize, dummy_object);
     systemCallLogger->Reset();
   }
 };
 
 TEST_F(ObjectizableTaskTest, New) {
-  t = objectizableTask->New(DummyAction, 4, kMaxTaskStackSize, dummy_object);
+  task = objectizableTask->New(DummyAction, 4, kMaxTaskStackSize, dummy_object);
 
-  ASSERT_TRUE(t != NULL);
+  ASSERT_TRUE(task != NULL);
   EXPECT_EQ(TA_HLNG | TA_RNG0, utkernelTskSpy->Attribute());
   EXPECT_EQ(9, utkernelTskSpy->Priority());
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
@@ -56,25 +56,25 @@ TEST_F(ObjectizableTaskTest, New) {
 }
 
 TEST_F(ObjectizableTaskTest, NewWithBoundaryPriority) {
-  t = objectizableTask->New(DummyAction, kHighestTaskPriority, kMaxTaskStackSize, NULL);
+  task = objectizableTask->New(DummyAction, kHighestTaskPriority, kMaxTaskStackSize, NULL);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
-  task->Delete(&t);
+  task->Delete(&task);
 
-  t = objectizableTask->New(DummyAction, kLowestTaskPriority, kMaxTaskStackSize, NULL);
+  task = objectizableTask->New(DummyAction, kLowestTaskPriority, kMaxTaskStackSize, NULL);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
 }
 
 TEST_F(ObjectizableTaskTest, NewWithOutOfRangePriority) {
-  t = objectizableTask->New(DummyAction, kHighestTaskPriority + 1, kMaxTaskStackSize, NULL);
+  task = objectizableTask->New(DummyAction, kHighestTaskPriority + 1, kMaxTaskStackSize, NULL);
   EXPECT_EQ(5, utkernelTskSpy->Priority());
-  task->Delete(&t);
+  task->Delete(&task);
 
-  t = objectizableTask->New(DummyAction, kLowestTaskPriority - 1, kMaxTaskStackSize, NULL);
+  task = objectizableTask->New(DummyAction, kLowestTaskPriority - 1, kMaxTaskStackSize, NULL);
   EXPECT_EQ(12, utkernelTskSpy->Priority());
 }
 
 TEST_F(ObjectizableTaskTest, NewWithOutOfRangeStackSize) {
-  t = objectizableTask->New(DummyAction, 4, kMaxTaskStackSize + 1, NULL);
+  task = objectizableTask->New(DummyAction, 4, kMaxTaskStackSize + 1, NULL);
 
   EXPECT_EQ(kMaxTaskStackSize, utkernelTskSpy->StackSize());
 }
@@ -82,9 +82,9 @@ TEST_F(ObjectizableTaskTest, NewWithOutOfRangeStackSize) {
 TEST_F(ObjectizableTaskTest, DeleteSelfTask) {
   NewObjectizableTask();
 
-  task->Delete(&t);
+  task->Delete(&task);
 
-  EXPECT_EQ(NULL, t);
+  EXPECT_EQ(NULL, task);
   EXPECT_STREQ(
       "+ tk_get_tid\n"
       "- tk_get_tid (0)\n"
@@ -97,9 +97,9 @@ TEST_F(ObjectizableTaskTest, DeleteOtherTask) {
   NewObjectizableTask();
   utkernelTskSpy->SetReturnCode(0, 1);
 
-  task->Delete(&t);
+  task->Delete(&task);
 
-  EXPECT_EQ(NULL, t);
+  EXPECT_EQ(NULL, task);
   EXPECT_STREQ(
       "+ tk_get_tid\n"
       "- tk_get_tid (1)\n"
@@ -113,7 +113,7 @@ TEST_F(ObjectizableTaskTest, DeleteOtherTask) {
 TEST_F(ObjectizableTaskTest, Run) {
   NewObjectizableTask();
 
-  task->Run(t);
+  task->Run(task);
 
   EXPECT_TRUE(was_ran);
   EXPECT_EQ(dummy_object, given_object);
@@ -128,7 +128,7 @@ TEST_F(ObjectizableTaskTest, Run) {
 TEST_F(ObjectizableTaskTest, SuspendSelfTask) {
   NewObjectizableTask();
 
-  task->Suspend(t);
+  task->Suspend(task);
 
   EXPECT_EQ(TMO_FEVR, utkernelTskSpy->Timeout());
   EXPECT_STREQ(
@@ -143,7 +143,7 @@ TEST_F(ObjectizableTaskTest, SuspendOtherTask) {
   NewObjectizableTask();
   utkernelTskSpy->SetReturnCode(0, 1);
 
-  task->Suspend(t);
+  task->Suspend(task);
 
   EXPECT_STREQ(
       "+ tk_get_tid\n"
@@ -158,9 +158,9 @@ TEST_F(ObjectizableTaskTest, SuspendOtherTask) {
 TEST_F(ObjectizableTaskTest, SuspendMultipleTimes) {
   NewObjectizableTask();
 
-  task->Suspend(t);
-  task->Suspend(t);
-  task->Suspend(t);
+  task->Suspend(task);
+  task->Suspend(task);
+  task->Suspend(task);
 
   EXPECT_STREQ(
       "+ tk_get_tid\n"
@@ -172,10 +172,10 @@ TEST_F(ObjectizableTaskTest, SuspendMultipleTimes) {
 
 TEST_F(ObjectizableTaskTest, ResumeTaskSuspendedByMyself) {
   NewObjectizableTask();
-  task->Suspend(t);
+  task->Suspend(task);
   systemCallLogger->Reset();
 
-  task->Resume(t);
+  task->Resume(task);
 
   EXPECT_STREQ(
       "+ tk_wup_tsk (0)\n"
@@ -186,10 +186,10 @@ TEST_F(ObjectizableTaskTest, ResumeTaskSuspendedByMyself) {
 TEST_F(ObjectizableTaskTest, ResumeTaskSuspendedByOther) {
   NewObjectizableTask();
   utkernelTskSpy->SetReturnCode(0, 1);
-  task->Suspend(t);
+  task->Suspend(task);
   systemCallLogger->Reset();
 
-  task->Resume(t);
+  task->Resume(task);
 
   EXPECT_STREQ(
       "+ tk_rsm_tsk (0)\n"
@@ -200,19 +200,19 @@ TEST_F(ObjectizableTaskTest, ResumeTaskSuspendedByOther) {
 TEST_F(ObjectizableTaskTest, ResumeTaskNotSuspended) {
   NewObjectizableTask();
 
-  task->Resume(t);
+  task->Resume(task);
 
   EXPECT_STREQ("", systemCallLogger->Get());
 }
 
 TEST_F(ObjectizableTaskTest, ResumeMultipleTimes) {
   NewObjectizableTask();
-  task->Suspend(t);
+  task->Suspend(task);
   systemCallLogger->Reset();
 
-  task->Resume(t);
-  task->Resume(t);
-  task->Resume(t);
+  task->Resume(task);
+  task->Resume(task);
+  task->Resume(task);
 
   EXPECT_STREQ(
       "+ tk_wup_tsk (0)\n"
