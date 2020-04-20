@@ -9,8 +9,5 @@ typedef struct MemoryPoolInterfaceStruct {
   void* (*Get)(MemoryPool self);
   void (*Release)(MemoryPool self, void* block);
 } MemoryPoolInterfaceStruct;
-typedef const MemoryPoolInterfaceStruct* MemoryPoolInterface;
-
-extern const MemoryPoolInterface memoryPool;
 
 #endif  // V1_MEMORY_POOL_H_
