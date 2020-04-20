@@ -5,12 +5,12 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "../inbox_private.h"
 #include "bleu/v1/heap.h"
 #include "utkernel/utkernel.h"
 
 typedef struct {
-  InboxStruct base;
+  InboxInterfaceStruct impl;
+  int mbx_id;
   int mpl_id;
   void* last_mail;
 } SimpleInboxStruct, *SimpleInbox;
@@ -21,12 +21,12 @@ static const int kHeaderSize = sizeof(T_MSG);
 
 static void Delete(Inbox* base) {
   SimpleInbox self = (SimpleInbox)*base;
-  tk_del_mbx(self->base.id);
+  tk_del_mbx(self->mbx_id);
   tk_del_mpl(self->mpl_id);
   heap->Delete((void**)base);
 }
 
-inline static void SendMail(SimpleInbox self, void* mail) { tk_snd_mbx(self->base.id, (T_MSG*)mail); }
+inline static void SendMail(SimpleInbox self, void* mail) { tk_snd_mbx(self->mbx_id, (T_MSG*)mail); }
 
 inline static bool PostTemplate(SimpleInbox self, const void* message, int size, ComposeDelegate compose) {
   void* mail = compose(self, message, size);
@@ -80,7 +80,7 @@ inline static void* GetTemplate(SimpleInbox self, GetDelegate get) {
 }
 
 static bool GetNextMail(SimpleInbox self) {
-  if (tk_rcv_mbx(self->base.id, (T_MSG**)&self->last_mail, TMO_POL) == E_OK) {
+  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_POL) == E_OK) {
     return true;
   } else {
     self->last_mail = NULL;  // Just in case.
@@ -91,7 +91,7 @@ static bool GetNextMail(SimpleInbox self) {
 static void* Get(Inbox self) { return GetTemplate((SimpleInbox)self, GetNextMail); }
 
 static bool BlockingGetNextMail(SimpleInbox self) {
-  if (tk_rcv_mbx(self->base.id, (T_MSG**)&self->last_mail, TMO_FEVR) == E_OK) {
+  if (tk_rcv_mbx(self->mbx_id, (T_MSG**)&self->last_mail, TMO_FEVR) == E_OK) {
     return true;
   } else {
     self->last_mail = NULL;  // Just in case.
@@ -101,17 +101,9 @@ static bool BlockingGetNextMail(SimpleInbox self) {
 
 static void* BlockingGet(Inbox self) { return GetTemplate((SimpleInbox)self, BlockingGetNextMail); }
 
-static const InboxInterfaceStruct kTheInterface = {
-    .Delete = Delete,
-    .Post = Post,
-    .BlockingPost = BlockingPost,
-    .Get = Get,
-    .BlockingGet = BlockingGet,
-};
-
 inline static void CreateMailbox(SimpleInbox self) {
   T_CMBX mbx_packet = {.mbxatr = (TA_TFIFO | TA_MFIFO)};
-  self->base.id = tk_cre_mbx(&mbx_packet);
+  self->mbx_id = tk_cre_mbx(&mbx_packet);
 }
 
 inline static int LimitCapacity(int capacity) { return capacity > kMaxInboxCapacity ? kMaxInboxCapacity : capacity; }
@@ -123,7 +115,11 @@ inline static void CreateMemoryPool(SimpleInbox self, int capacity) {
 
 static Inbox New(int capacity) {
   SimpleInbox self = (SimpleInbox)heap->New(sizeof(SimpleInboxStruct));
-  self->base.impl = &kTheInterface;
+  self->impl.Delete = Delete;
+  self->impl.Post = Post;
+  self->impl.BlockingPost = BlockingPost;
+  self->impl.Get = Get;
+  self->impl.BlockingGet = BlockingGet;
   CreateMailbox(self);
   CreateMemoryPool(self, capacity);
   return (Inbox)self;

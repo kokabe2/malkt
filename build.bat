@@ -9,9 +9,8 @@ set COMPILER=ccrx
 set OUTPUT_DIR=bin\%COMPILER%@%PROJECT_VER%
 mkdir %OUTPUT_DIR% > NUL 2>&1
 %COMPILER% -output=obj -lang=c99 -nostuff -isa=rxv3 -debug -signed_char ^
-           -include=v1/,external/ ^
+           -include=v1/,src/,external/ ^
            src/inbox/utkernel/simple_inbox.c ^
-           src/inbox/inbox.c ^
            src/isr/utkernel/basic_isr.c ^
            src/isr/isr.c ^
            src/memory_pool/utkernel/basic_memory_pool.c ^

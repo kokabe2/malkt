@@ -1,5 +1,6 @@
 include_directories(
     ${PROJECT_SOURCE_DIR}/v1
+    ${PROJECT_SOURCE_DIR}/src
     ${PROJECT_SOURCE_DIR}/external
     ${PROJECT_SOURCE_DIR}/external/bleu/v1
     )
@@ -7,7 +8,6 @@ include_directories(
 add_library(
     malkt
     inbox/utkernel/simple_inbox.c
-    inbox/inbox.c
     isr/utkernel/basic_isr.c
     isr/isr.c
     memory_pool/utkernel/basic_memory_pool.c
