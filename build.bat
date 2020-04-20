@@ -12,7 +12,6 @@ mkdir %OUTPUT_DIR% > NUL 2>&1
            -include=v1/,src/,external/ ^
            src/inbox/utkernel/simple_inbox.c ^
            src/isr/utkernel/basic_isr.c ^
-           src/isr/isr.c ^
            src/memory_pool/utkernel/basic_memory_pool.c ^
            src/memory_pool/memory_pool.c ^
            src/task/utkernel/objectizable_task.c ^

@@ -3,8 +3,8 @@
 #include "gtest/gtest.h"
 
 extern "C" {
-#include "../../util/system_call_logger.h"
 #include "basic_isr.h"
+#include "util/system_call_logger.h"
 #include "utkernel_int_spy.h"
 }
 
@@ -14,7 +14,7 @@ void DummyInterrupt(int unused) {}
 
 class BasicIsrTest : public ::testing::Test {
  protected:
-  Isr i;
+  Isr isr;
 
   virtual void SetUp() {
     utkernelIntSpy->Reset();
@@ -22,19 +22,19 @@ class BasicIsrTest : public ::testing::Test {
   }
 
   virtual void TearDown() {
-    if (i != NULL) isr->Delete(&i);
+    if (isr != NULL) isr->Delete(&isr);
   }
 
   void NewBasicIsr(void) {
-    i = basicIsr->New(24, 8, DummyInterrupt);
+    isr = basicIsr->New(24, 8, DummyInterrupt);
     systemCallLogger->Reset();
   }
 };
 
 TEST_F(BasicIsrTest, New) {
-  i = basicIsr->New(24, 8, DummyInterrupt);
+  isr = basicIsr->New(24, 8, DummyInterrupt);
 
-  ASSERT_TRUE(i != NULL);
+  ASSERT_TRUE(isr != NULL);
   EXPECT_EQ((FP)DummyInterrupt, utkernelIntSpy->InterruptHandler());
   EXPECT_EQ(TA_HLNG, utkernelIntSpy->Attribute());
   EXPECT_STREQ(
@@ -46,9 +46,9 @@ TEST_F(BasicIsrTest, New) {
 TEST_F(BasicIsrTest, Delete) {
   NewBasicIsr();
 
-  isr->Delete(&i);
+  isr->Delete(&isr);
 
-  EXPECT_EQ(NULL, i);
+  EXPECT_EQ(NULL, isr);
   EXPECT_NE((FP)DummyInterrupt, utkernelIntSpy->InterruptHandler());
   EXPECT_STREQ(
       "+ DisableInt (24)\n"
@@ -61,7 +61,7 @@ TEST_F(BasicIsrTest, Delete) {
 TEST_F(BasicIsrTest, Enable) {
   NewBasicIsr();
 
-  isr->Enable(i);
+  isr->Enable(isr);
 
   EXPECT_EQ(8, utkernelIntSpy->Level());
   EXPECT_STREQ(
@@ -73,7 +73,7 @@ TEST_F(BasicIsrTest, Enable) {
 TEST_F(BasicIsrTest, Disable) {
   NewBasicIsr();
 
-  isr->Disable(i);
+  isr->Disable(isr);
 
   EXPECT_STREQ(
       "+ DisableInt (24)\n"

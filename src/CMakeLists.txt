@@ -9,7 +9,6 @@ add_library(
     malkt
     inbox/utkernel/simple_inbox.c
     isr/utkernel/basic_isr.c
-    isr/isr.c
     memory_pool/utkernel/basic_memory_pool.c
     memory_pool/memory_pool.c
     task/utkernel/objectizable_task.c
